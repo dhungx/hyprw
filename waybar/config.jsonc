@@ -1,7 +1,7 @@
 // ══════════════════════════════════════════════
-// WAYBAR CONFIG — bản tối thiểu ngày 1
-// File này định nghĩa CÓ MODULE GÌ và Ở ĐÂU trên bar.
-// Màu sắc/hình dáng nằm ở file style.css riêng, không sửa ở đây.
+// WAYBAR CONFIG — bản "rice" hoàn chỉnh
+// Icon dùng glyph Nerd Font (không emoji) — nhiều module đổi icon
+// theo % thật (volume/battery), không phải icon tĩnh.
 // ══════════════════════════════════════════════
 {
     "layer": "top",
@@ -9,10 +9,9 @@
     "height": 34,
     "spacing": 4,
 
-    // 3 cụm: trái - giữa - phải, giống bố cục thanh taskbar thông thường
-    "modules-left": ["hyprland/workspaces"],
+    "modules-left": ["hyprland/workspaces", "idle_inhibitor"],
     "modules-center": ["clock"],
-    "modules-right": ["pulseaudio", "network", "battery", "tray"],
+    "modules-right": ["cpu", "memory", "pulseaudio", "network", "battery", "tray", "custom/power"],
 
     "hyprland/workspaces": {
         "format": "{icon}",
@@ -23,27 +22,54 @@
         }
     },
 
+    "idle_inhibitor": {
+        "format": "{icon}",
+        "format-icons": {
+            "activated": "\uf06e",     // fa-eye — đang chặn tự khoá máy
+            "deactivated": "\uf070"    // fa-eye-slash — bình thường
+        }
+    },
+
     "clock": {
         "format": "{:%H:%M  %d/%m/%Y}",
         "tooltip-format": "{:%A, %d %B %Y}"
     },
 
-    "pulseaudio": {
-        "format": "{volume}% 🔊",
-        "format-muted": "🔇",
-        "on-click": "pavucontrol"    // click vào icon volume mở app điều chỉnh chi tiết
+    "cpu": {
+        "format": "\uf2db {usage}%",   // fa-microchip
+        "interval": 3
     },
 
+    "memory": {
+        "format": "\uf538 {percentage}%",   // fa-memory
+        "tooltip-format": "{used:0.1f}GB / {total:0.1f}GB"
+    },
+
+    // Icon đổi theo % volume thật: thấp → vừa → cao (chia đều theo mảng)
+    "pulseaudio": {
+        "format": "{icon} {volume}%",
+        "format-muted": "\uf6a9 Tắt tiếng",   // fa-volume-mute
+        "format-icons": {
+            "default": ["\uf026", "\uf027", "\uf028"]   // volume-off/down/up theo mức %
+        },
+        "on-click": "pavucontrol"
+    },
+
+    // Vạch tín hiệu kiểu thanh cao thấp — hiện đúng cường độ WiFi thật,
+    // không cần font đặc biệt (render đúng ở mọi font monospace)
     "network": {
-        "format-wifi": "{signalStrength}% 📶",
-        "format-ethernet": "🔗 {ipaddr}",
-        "format-disconnected": "⚠ Không có mạng",
+        "format-wifi": "{icon} {signalStrength}%",
+        "format-ethernet": "\uf796 {ipaddr}",   // fa-ethernet
+        "format-disconnected": "Không có mạng",
+        "format-icons": ["▂", "▄", "▆", "█"],
         "tooltip-format": "{ifname}: {ipaddr}"
     },
 
+    // Icon pin đổi theo đúng % thật: rỗng → 1/4 → nửa → 3/4 → đầy
     "battery": {
-        "format": "{capacity}% 🔋",
-        "format-charging": "{capacity}% ⚡",
+        "format": "{icon} {capacity}%",
+        "format-charging": "\uf0e7 {capacity}%",   // fa-bolt khi đang sạc
+        "format-icons": ["\uf244", "\uf243", "\uf242", "\uf241", "\uf240"],
         "states": {
             "warning": 20,
             "critical": 10
@@ -52,10 +78,11 @@
 
     "tray": {
         "spacing": 8
+    },
+
+    "custom/power": {
+        "format": "\uf011",   // fa-power-off
+        "on-click": "wlogout",
+        "tooltip": false
     }
 }
-
-// ══════════════════════════════════════════════
-// CẦN CÀI để đúng module trên chạy được:
-// waybar pavucontrol wireplumber networkmanager
-// ══════════════════════════════════════════════

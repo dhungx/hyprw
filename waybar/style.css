@@ -1,7 +1,5 @@
 /* ══════════════════════════════════════════════
-   WAYBAR STYLE — bản tối giản, dễ đọc, dễ sửa
-   Đây là chỗ bạn tự quyết định "sạch" nghĩa là gì —
-   đổi màu hex bên dưới theo ý thích, không cần hiểu hết CSS mới sửa được.
+   WAYBAR STYLE — Catppuccin Mocha, đồng bộ với hyprland.lua/hyprlock/wlogout
    ══════════════════════════════════════════════ */
 
 * {
@@ -13,49 +11,56 @@
 }
 
 window#waybar {
-    background-color: rgba(30, 30, 46, 0.85);   /* nền bar, hơi trong suốt */
-    color: #cdd6f4;                              /* màu chữ mặc định */
+    background-color: rgba(30, 30, 46, 0.85);
+    color: #cdd6f4;
 }
 
-/* Cụm workspace bên trái */
 #workspaces button {
     padding: 0 8px;
     color: #6c7086;
     background: transparent;
 }
 #workspaces button.active {
-    color: #89b4fa;   /* màu workspace đang chọn */
+    color: #89b4fa;
 }
 #workspaces button:hover {
     color: #cdd6f4;
 }
 
-/* Đồng hồ giữa bar */
+#idle_inhibitor {
+    padding: 0 10px;
+    color: #f9e2af;
+}
+
 #clock {
     font-weight: bold;
     padding: 0 10px;
 }
 
-/* Các module bên phải — mỗi cái 1 khối bo góc nhẹ */
+#cpu,
+#memory,
 #pulseaudio,
 #network,
 #battery,
-#tray {
+#tray,
+#custom-power {
     padding: 0 10px;
     margin: 4px 2px;
     background-color: rgba(49, 50, 68, 0.6);
     border-radius: 6px;
 }
 
-#battery.warning {
-    color: #f9e2af;   /* vàng khi pin yếu */
+#custom-power {
+    color: #f38ba8;
 }
-#battery.critical {
-    color: #f38ba8;   /* đỏ khi pin cực yếu */
+#custom-power:hover {
+    background-color: #f38ba8;
+    color: #1e1e2e;
 }
 
-/* ══════════════════════════════════════════════
-   Muốn đổi tông màu nhanh: chỉ cần đổi các mã hex ở trên.
-   Bảng màu đang dùng là Catppuccin Mocha — tra "catppuccin mocha hex"
-   nếu muốn xem thêm màu khác cùng bộ để phối đồng nhất.
-   ══════════════════════════════════════════════ */
+#battery.warning {
+    color: #f9e2af;
+}
+#battery.critical {
+    color: #f38ba8;
+}
