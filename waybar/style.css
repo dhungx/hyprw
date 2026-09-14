@@ -1,0 +1,61 @@
+/* ══════════════════════════════════════════════
+   WAYBAR STYLE — bản tối giản, dễ đọc, dễ sửa
+   Đây là chỗ bạn tự quyết định "sạch" nghĩa là gì —
+   đổi màu hex bên dưới theo ý thích, không cần hiểu hết CSS mới sửa được.
+   ══════════════════════════════════════════════ */
+
+* {
+    font-family: "JetBrainsMono Nerd Font", sans-serif;
+    font-size: 13px;
+    border: none;
+    border-radius: 0;
+    min-height: 0;
+}
+
+window#waybar {
+    background-color: rgba(30, 30, 46, 0.85);   /* nền bar, hơi trong suốt */
+    color: #cdd6f4;                              /* màu chữ mặc định */
+}
+
+/* Cụm workspace bên trái */
+#workspaces button {
+    padding: 0 8px;
+    color: #6c7086;
+    background: transparent;
+}
+#workspaces button.active {
+    color: #89b4fa;   /* màu workspace đang chọn */
+}
+#workspaces button:hover {
+    color: #cdd6f4;
+}
+
+/* Đồng hồ giữa bar */
+#clock {
+    font-weight: bold;
+    padding: 0 10px;
+}
+
+/* Các module bên phải — mỗi cái 1 khối bo góc nhẹ */
+#pulseaudio,
+#network,
+#battery,
+#tray {
+    padding: 0 10px;
+    margin: 4px 2px;
+    background-color: rgba(49, 50, 68, 0.6);
+    border-radius: 6px;
+}
+
+#battery.warning {
+    color: #f9e2af;   /* vàng khi pin yếu */
+}
+#battery.critical {
+    color: #f38ba8;   /* đỏ khi pin cực yếu */
+}
+
+/* ══════════════════════════════════════════════
+   Muốn đổi tông màu nhanh: chỉ cần đổi các mã hex ở trên.
+   Bảng màu đang dùng là Catppuccin Mocha — tra "catppuccin mocha hex"
+   nếu muốn xem thêm màu khác cùng bộ để phối đồng nhất.
+   ══════════════════════════════════════════════ */

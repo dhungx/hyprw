@@ -1,0 +1,61 @@
+// ══════════════════════════════════════════════
+// WAYBAR CONFIG — bản tối thiểu ngày 1
+// File này định nghĩa CÓ MODULE GÌ và Ở ĐÂU trên bar.
+// Màu sắc/hình dáng nằm ở file style.css riêng, không sửa ở đây.
+// ══════════════════════════════════════════════
+{
+    "layer": "top",
+    "position": "top",
+    "height": 34,
+    "spacing": 4,
+
+    // 3 cụm: trái - giữa - phải, giống bố cục thanh taskbar thông thường
+    "modules-left": ["hyprland/workspaces"],
+    "modules-center": ["clock"],
+    "modules-right": ["pulseaudio", "network", "battery", "tray"],
+
+    "hyprland/workspaces": {
+        "format": "{icon}",
+        "on-click": "activate",
+        "format-icons": {
+            "default": "○",
+            "active": "●"
+        }
+    },
+
+    "clock": {
+        "format": "{:%H:%M  %d/%m/%Y}",
+        "tooltip-format": "{:%A, %d %B %Y}"
+    },
+
+    "pulseaudio": {
+        "format": "{volume}% 🔊",
+        "format-muted": "🔇",
+        "on-click": "pavucontrol"    // click vào icon volume mở app điều chỉnh chi tiết
+    },
+
+    "network": {
+        "format-wifi": "{signalStrength}% 📶",
+        "format-ethernet": "🔗 {ipaddr}",
+        "format-disconnected": "⚠ Không có mạng",
+        "tooltip-format": "{ifname}: {ipaddr}"
+    },
+
+    "battery": {
+        "format": "{capacity}% 🔋",
+        "format-charging": "{capacity}% ⚡",
+        "states": {
+            "warning": 20,
+            "critical": 10
+        }
+    },
+
+    "tray": {
+        "spacing": 8
+    }
+}
+
+// ══════════════════════════════════════════════
+// CẦN CÀI để đúng module trên chạy được:
+// waybar pavucontrol wireplumber networkmanager
+// ══════════════════════════════════════════════
