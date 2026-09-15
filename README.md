@@ -25,6 +25,14 @@ cp wlogout/style.css   ~/.config/wlogout/style.css
 
 cp gtk-3.0/settings.ini ~/.config/gtk-3.0/settings.ini
 cp gtk-4.0/settings.ini ~/.config/gtk-4.0/settings.ini
+
+mkdir -p ~/.config/fastfetch
+cp fastfetch/config.jsonc ~/.config/fastfetch/config.jsonc
+
+mkdir -p ~/.config/dunst ~/.config/fuzzel ~/.config/foot
+cp dunst/dunstrc      ~/.config/dunst/dunstrc
+cp fuzzel/fuzzel.ini  ~/.config/fuzzel/fuzzel.ini
+cp foot/foot.ini      ~/.config/foot/foot.ini
 ```
 
 ## Cài package
@@ -33,7 +41,7 @@ sudo pacman -S hyprland waybar dunst hyprpaper hypridle hyprlock wlogout \
                foot thunar fuzzel cliphist \
                grim slurp wl-clipboard wireplumber brightnessctl playerctl \
                hyprpolkitagent qt6ct nwg-look papirus-icon-theme networkmanager \
-               ttf-jetbrains-mono-nerd
+               ttf-jetbrains-mono-nerd fastfetch
 
 # Theme GTK (AUR — cần paru/yay)
 paru -S catppuccin-gtk-theme-blue
@@ -95,10 +103,19 @@ gtk-3.0, gtk-4.0/     — đồng bộ theme cho app GTK
 - Icon trên bar dùng glyph Nerd Font (không emoji) — cần font
   `ttf-jetbrains-mono-nerd` đã có trong danh sách cài ở trên. Mã icon đã đối
   chiếu trực tiếp với dữ liệu gốc `github.com/ryanoasis/nerd-fonts` (không
-  đoán từ trí nhớ). Icon volume/battery tự đổi theo % thật, không phải icon
-  tĩnh. Riêng vạch WiFi dùng ký tự khối `▂▄▆█` thay vì icon font — chắc chắn
-  hiện đúng ở mọi font monospace, không phụ thuộc gói font ngoài. Nếu thấy ô
-  vuông trống thay vì icon → font chưa cài đúng, kiểm tra `fc-list | grep -i nerd`
+  đoán từ trí nhớ). Icon volume/battery/WiFi tự đổi theo dữ liệu thật (%
+  volume, % pin, cường độ tín hiệu), không phải icon tĩnh
+- Icon WiFi dùng đúng hình quạt sóng chuẩn (Material Design Icons
+  `wifi_strength_1..4` + `wifi_strength_off` khi mất mạng, mã U+F091F–U+F092D)
+  — 5 trạng thái, đổi theo cường độ tín hiệu thật, không còn chữ. Đây là icon
+  nằm ở vùng mã 5-hex-digit nên chèn thẳng ký tự Unicode trong file, không
+  dùng escape `\uXXXX` như các icon khác (JSON chỉ hỗ trợ 4 hex cho escape).
+  Nếu thấy ô vuông trống thay vì icon → font chưa cài đúng, kiểm tra
+  `fc-list | grep -i nerd`
+- `fastfetch/config.jsonc` hiện 11 module: OS, Kernel, Uptime, Packages,
+  Shell, WM, Terminal, CPU, GPU, Memory, Disk
+- `dunst`, `fuzzel`, `foot` đã có theme Catppuccin Mocha riêng (trước đây có
+  cài nhưng chưa có config — sẽ hiện giao diện mặc định nếu thiếu 3 file này)
 - Blur/animation đã bật sẵn (RTX 3050 dư sức) — muốn tắt cho nhẹ hơn nữa, sửa
   `blur.enabled = false` trong `hyprland.lua`
 - hypridle tự tạm dừng khi trình duyệt/video player đang phát video hoặc game

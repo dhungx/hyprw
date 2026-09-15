@@ -49,20 +49,21 @@
     // Icon đổi theo % volume thật: thấp → vừa → cao
     "pulseaudio": {
         "format": "{icon} {volume}%",
-        "format-muted": "\ueee8 Tắt tiếng",   // nf-fa-volume_xmark (đã sửa, mã cũ f6a9 sai)
+        "format-muted": "\ueee8",   // nf-fa-volume_xmark (đã sửa, mã cũ f6a9 sai) — chỉ icon, bỏ chữ
         "format-icons": {
             "default": ["\uf026", "\uf027", "\uf028"]   // volume_off/down/up
         },
         "on-click": "pavucontrol"
     },
 
-    // Vạch tín hiệu WiFi kiểu thanh cao thấp — không phụ thuộc font đặc biệt,
-    // đổi đúng theo cường độ tín hiệu thật ở mọi font monospace
+    // Icon WiFi chuẩn (hình quạt sóng, Material Design Icons) — 4 mức,
+    // đổi đúng theo cường độ tín hiệu thật. Mã U+F091F/F0922/F0925/F0928,
+    // đã xác minh chéo qua nhiều nguồn độc lập trước khi chèn.
     "network": {
         "format-wifi": "{icon} {signalStrength}%",
         "format-ethernet": "\uef44 {ipaddr}",   // nf-fa-ethernet (đã sửa, mã cũ f796 sai)
-        "format-disconnected": "Không có mạng",
-        "format-icons": ["▂", "▄", "▆", "█"],
+        "format-disconnected": "󰤭",
+        "format-icons": ["󰤟", "󰤢", "󰤥", "󰤨"],
         "tooltip-format": "{ifname}: {ipaddr}"
     },
 
