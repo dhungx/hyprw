@@ -93,9 +93,12 @@ gtk-3.0, gtk-4.0/     — đồng bộ theme cho app GTK
 
 ## Ghi chú
 - Icon trên bar dùng glyph Nerd Font (không emoji) — cần font
-  `ttf-jetbrains-mono-nerd` đã có trong danh sách cài ở trên. Icon volume/battery
-  tự đổi theo % thật, không phải icon tĩnh. Nếu thấy ô vuông trống thay vì icon
-  → font chưa cài đúng, kiểm tra lại `fc-list | grep -i nerd`
+  `ttf-jetbrains-mono-nerd` đã có trong danh sách cài ở trên. Mã icon đã đối
+  chiếu trực tiếp với dữ liệu gốc `github.com/ryanoasis/nerd-fonts` (không
+  đoán từ trí nhớ). Icon volume/battery tự đổi theo % thật, không phải icon
+  tĩnh. Riêng vạch WiFi dùng ký tự khối `▂▄▆█` thay vì icon font — chắc chắn
+  hiện đúng ở mọi font monospace, không phụ thuộc gói font ngoài. Nếu thấy ô
+  vuông trống thay vì icon → font chưa cài đúng, kiểm tra `fc-list | grep -i nerd`
 - Blur/animation đã bật sẵn (RTX 3050 dư sức) — muốn tắt cho nhẹ hơn nữa, sửa
   `blur.enabled = false` trong `hyprland.lua`
 - hypridle tự tạm dừng khi trình duyệt/video player đang phát video hoặc game

@@ -1,7 +1,8 @@
 // ══════════════════════════════════════════════
 // WAYBAR CONFIG — bản "rice" hoàn chỉnh
-// Icon dùng glyph Nerd Font (không emoji) — nhiều module đổi icon
-// theo % thật (volume/battery), không phải icon tĩnh.
+// Icon Nerd Font, đã đối chiếu trực tiếp với dữ liệu gốc
+// github.com/ryanoasis/nerd-fonts (glyph-names.json / cheat sheet chính thức)
+// — không dùng icon đoán từ trí nhớ.
 // ══════════════════════════════════════════════
 {
     "layer": "top",
@@ -25,8 +26,8 @@
     "idle_inhibitor": {
         "format": "{icon}",
         "format-icons": {
-            "activated": "\uf06e",     // fa-eye — đang chặn tự khoá máy
-            "deactivated": "\uf070"    // fa-eye-slash — bình thường
+            "activated": "\uf06e",     // nf-fa-eye
+            "deactivated": "\uf070"    // nf-fa-eye_slash
         }
     },
 
@@ -36,30 +37,30 @@
     },
 
     "cpu": {
-        "format": "\uf2db {usage}%",   // fa-microchip
+        "format": "\uf2db {usage}%",   // nf-fa-microchip
         "interval": 3
     },
 
     "memory": {
-        "format": "\uf538 {percentage}%",   // fa-memory
+        "format": "\uefc5 {percentage}%",   // nf-fa-memory (đã sửa, mã cũ f538 sai)
         "tooltip-format": "{used:0.1f}GB / {total:0.1f}GB"
     },
 
-    // Icon đổi theo % volume thật: thấp → vừa → cao (chia đều theo mảng)
+    // Icon đổi theo % volume thật: thấp → vừa → cao
     "pulseaudio": {
         "format": "{icon} {volume}%",
-        "format-muted": "\uf6a9 Tắt tiếng",   // fa-volume-mute
+        "format-muted": "\ueee8 Tắt tiếng",   // nf-fa-volume_xmark (đã sửa, mã cũ f6a9 sai)
         "format-icons": {
-            "default": ["\uf026", "\uf027", "\uf028"]   // volume-off/down/up theo mức %
+            "default": ["\uf026", "\uf027", "\uf028"]   // volume_off/down/up
         },
         "on-click": "pavucontrol"
     },
 
-    // Vạch tín hiệu kiểu thanh cao thấp — hiện đúng cường độ WiFi thật,
-    // không cần font đặc biệt (render đúng ở mọi font monospace)
+    // Vạch tín hiệu WiFi kiểu thanh cao thấp — không phụ thuộc font đặc biệt,
+    // đổi đúng theo cường độ tín hiệu thật ở mọi font monospace
     "network": {
         "format-wifi": "{icon} {signalStrength}%",
-        "format-ethernet": "\uf796 {ipaddr}",   // fa-ethernet
+        "format-ethernet": "\uef44 {ipaddr}",   // nf-fa-ethernet (đã sửa, mã cũ f796 sai)
         "format-disconnected": "Không có mạng",
         "format-icons": ["▂", "▄", "▆", "█"],
         "tooltip-format": "{ifname}: {ipaddr}"
@@ -68,7 +69,7 @@
     // Icon pin đổi theo đúng % thật: rỗng → 1/4 → nửa → 3/4 → đầy
     "battery": {
         "format": "{icon} {capacity}%",
-        "format-charging": "\uf0e7 {capacity}%",   // fa-bolt khi đang sạc
+        "format-charging": "\uf0e7 {capacity}%",   // nf-fa-bolt khi đang sạc
         "format-icons": ["\uf244", "\uf243", "\uf242", "\uf241", "\uf240"],
         "states": {
             "warning": 20,
@@ -81,7 +82,7 @@
     },
 
     "custom/power": {
-        "format": "\uf011",   // fa-power-off
+        "format": "\uf011",   // nf-fa-power_off
         "on-click": "wlogout",
         "tooltip": false
     }
