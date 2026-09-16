@@ -13,6 +13,7 @@ chỉ dùng `hyprland.lua` trong bộ này.
 mkdir -p ~/.config/hypr ~/.config/waybar ~/.config/wlogout ~/.config/gtk-3.0 ~/.config/gtk-4.0
 
 cp hypr/hyprland.lua   ~/.config/hypr/hyprland.lua
+cp -r hypr/modules     ~/.config/hypr/modules
 cp hypr/hypridle.conf  ~/.config/hypr/hypridle.conf
 cp hypr/hyprlock.conf  ~/.config/hypr/hyprlock.conf
 cp hypr/hyprpaper.conf ~/.config/hypr/hyprpaper.conf
@@ -39,6 +40,9 @@ cp shell/starship.toml ~/.config/starship.toml
 
 mkdir -p ~/.config/xdg-desktop-portal
 cp xdg-desktop-portal/portals.conf ~/.config/xdg-desktop-portal/portals.conf
+
+cp -r qt5ct ~/.config/qt5ct
+cp -r qt6ct ~/.config/qt6ct
 ```
 
 Đặt zsh làm shell mặc định (bắt buộc, không thì `.zshrc` không tự chạy khi mở terminal):
@@ -52,7 +56,7 @@ chsh -s /usr/bin/zsh
 sudo pacman -S hyprland waybar dunst hyprpaper hypridle hyprlock wlogout \
                foot thunar fuzzel cliphist \
                grim slurp wl-clipboard wireplumber brightnessctl playerctl \
-               hyprpolkitagent qt6ct nwg-look papirus-icon-theme networkmanager \
+               hyprpolkitagent qt5ct qt6ct nwg-look papirus-icon-theme networkmanager \
                ttf-jetbrains-mono-nerd fastfetch \
                zsh zsh-autosuggestions zsh-syntax-highlighting starship
 
@@ -65,9 +69,8 @@ paru -S catppuccin-gtk-theme-blue
    dùng `river_to_castle_theme_blue.jpeg`. Đổi ảnh khác thì sửa path trong cả
    `hyprpaper.conf` và `hyprlock.conf` (2 chỗ, phải khớp nhau)
 2. **Màn hình 144Hz:** `hyprctl monitors` lấy tên thật, sửa khối `hl.monitor({...})`
-   đầu file `hyprland.lua`
-3. **Theme Qt:** chạy `qt6ct` một lần, chọn theme tối trong GUI để app Qt đồng bộ
-   với GTK
+   trong `~/.config/hypr/modules/Monitors.lua`
+3. ~~Theme Qt~~ — đã cấu hình sẵn, không cần chạy `qt6ct` GUI thủ công nữa
 4. **NVIDIA hybrid — tránh Electron app (Discord/VSCode/Chrome) treo máy lúc boot:**
    sửa `/etc/mkinitcpio.conf`, dòng `MODULES=`, thêm `i915` **trước** các module
    nvidia:
@@ -79,7 +82,11 @@ paru -S catppuccin-gtk-theme-blue
 
 ## Cấu trúc thư mục
 ```
-hypr/hyprland.lua     — cấu hình chính: bind, animation, window rules (Lua)
+hypr/hyprland.lua     — entry point, chỉ có require() tới từng module
+hypr/modules/         — Monitors, ENVariables, Startup_Apps, LookAndFeel,
+                        Input, Keybinds, WindowRules — mỗi thứ 1 file riêng
+                        (kiểu chia của JaKooLit/KooL, sửa module nào mở
+                        đúng file đó, không cần đụng hyprland.lua)
 hypr/hypridle.conf    — quản lý idle/khoá máy tự động (định dạng riêng, không Lua)
 hypr/hyprlock.conf    — giao diện màn hình khoá (định dạng riêng, không Lua)
 hypr/hyprpaper.conf   — hình nền
@@ -143,8 +150,20 @@ gtk-3.0, gtk-4.0/     — đồng bộ theme cho app GTK
   `hyprland.lua` — cần cả 2 để screen share qua Zoom/OBS/Discord chạy đúng.
   Thiếu export biến môi trường vào systemd là nguyên nhân phổ biến nhất gây
   lỗi portal trên Hyprland, không chỉ riêng thiếu file portals.conf
+- `qt5ct`/`qt6ct`: biến `QT_QPA_PLATFORMTHEME` set thành **"qt5ct"** (không
+  phải "qt6ct") — qt6ct tự nhận diện giá trị này để theme luôn cả app Qt6, set
+  ngược lại sẽ làm app Qt5 mất theme. Cả 2 đã có sẵn `qt5ct.conf`/`qt6ct.conf`
+  + file màu Catppuccin Mocha khớp đúng bảng màu dùng xuyên suốt rice, không
+  cần tự mở GUI chỉnh tay
+- Cấu hình Hyprland đã chia theo module (`hypr/modules/`), giống kiểu
+  JaKooLit/KooL — sửa gì thì mở đúng file đó (`Keybinds.lua` cho phím tắt,
+  `WindowRules.lua` cho window rules...), `hyprland.lua` chỉ còn
+  `require()`. 1 lưu ý kỹ thuật: mỗi file `require()` là 1 scope Lua riêng
+  — biến dùng chung (`terminal`, `mainMod`...) nằm ở `modules/shared.lua`,
+  module nào cần thì tự `require("modules.shared")`, không tự thấy biến
+  của file khác
 - Blur/animation đã bật sẵn (RTX 3050 dư sức) — muốn tắt cho nhẹ hơn nữa, sửa
-  `blur.enabled = false` trong `hyprland.lua`
+  `blur.enabled = false` trong `hypr/modules/LookAndFeel.lua`
 - hypridle tự tạm dừng khi trình duyệt/video player đang phát video hoặc game
   đang fullscreen (chuẩn Wayland idle-inhibit) — không cần lo màn hình tự khoá
   giữa lúc chơi game/xem phim với hầu hết app hiện đại
