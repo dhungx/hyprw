@@ -36,6 +36,9 @@ cp foot/foot.ini      ~/.config/foot/foot.ini
 
 cp shell/zshrc         ~/.zshrc
 cp shell/starship.toml ~/.config/starship.toml
+
+mkdir -p ~/.config/xdg-desktop-portal
+cp xdg-desktop-portal/portals.conf ~/.config/xdg-desktop-portal/portals.conf
 ```
 
 Đặt zsh làm shell mặc định (bắt buộc, không thì `.zshrc` không tự chạy khi mở terminal):
@@ -58,7 +61,9 @@ paru -S catppuccin-gtk-theme-blue
 ```
 
 ## Việc cần làm sau khi cài
-1. **Ảnh nền:** bỏ vào `~/Pictures/wallpaper.jpg` (dùng chung cho hyprpaper + hyprlock)
+1. **Ảnh nền:** `cp -r wallpaper ~/.config/hypr/wallpapers` — 8 ảnh có sẵn, mặc định
+   dùng `river_to_castle_theme_blue.jpeg`. Đổi ảnh khác thì sửa path trong cả
+   `hyprpaper.conf` và `hyprlock.conf` (2 chỗ, phải khớp nhau)
 2. **Màn hình 144Hz:** `hyprctl monitors` lấy tên thật, sửa khối `hl.monitor({...})`
    đầu file `hyprland.lua`
 3. **Theme Qt:** chạy `qt6ct` một lần, chọn theme tối trong GUI để app Qt đồng bộ
@@ -78,6 +83,7 @@ hypr/hyprland.lua     — cấu hình chính: bind, animation, window rules (Lua
 hypr/hypridle.conf    — quản lý idle/khoá máy tự động (định dạng riêng, không Lua)
 hypr/hyprlock.conf    — giao diện màn hình khoá (định dạng riêng, không Lua)
 hypr/hyprpaper.conf   — hình nền
+wallpaper/            — 8 ảnh nền có sẵn, copy sang ~/.config/hypr/wallpapers/
 waybar/               — thanh bar
 wlogout/              — menu nguồn (khoá/đăng xuất/tắt máy)
 gtk-3.0, gtk-4.0/     — đồng bộ theme cho app GTK
@@ -130,6 +136,13 @@ gtk-3.0, gtk-4.0/     — đồng bộ theme cho app GTK
   path pacman cài, tự bỏ qua nếu chưa cài, không lỗi) + prompt `starship`
   theme cùng bảng màu. Nhớ chạy `chsh -s /usr/bin/zsh` — chỉ cài package
   không tự đổi shell mặc định
+- `wlogout` giờ dùng icon Nerd Font thật (đặt trong field `text` của layout,
+  hiển thị như label thật — không phải PNG hay CSS content ảo), đồng bộ với
+  waybar
+- `portals.conf` + dòng `dbus-update-activation-environment` trong
+  `hyprland.lua` — cần cả 2 để screen share qua Zoom/OBS/Discord chạy đúng.
+  Thiếu export biến môi trường vào systemd là nguyên nhân phổ biến nhất gây
+  lỗi portal trên Hyprland, không chỉ riêng thiếu file portals.conf
 - Blur/animation đã bật sẵn (RTX 3050 dư sức) — muốn tắt cho nhẹ hơn nữa, sửa
   `blur.enabled = false` trong `hyprland.lua`
 - hypridle tự tạm dừng khi trình duyệt/video player đang phát video hoặc game

@@ -1,30 +1,30 @@
 {
     "label" : "lock",
     "action" : "hyprlock",
-    "text" : "Khoá máy",
+    "text" : "",
     "keybind" : "l"
 }
 {
     "label" : "logout",
     "action" : "hyprctl dispatch exit",
-    "text" : "Đăng xuất",
+    "text" : "",
     "keybind" : "e"
 }
 {
     "label" : "suspend",
     "action" : "systemctl suspend",
-    "text" : "Ngủ đông",
+    "text" : "",
     "keybind" : "u"
 }
 {
     "label" : "reboot",
     "action" : "systemctl reboot",
-    "text" : "Khởi động lại",
+    "text" : "",
     "keybind" : "r"
 }
 {
     "label" : "shutdown",
     "action" : "systemctl poweroff",
-    "text" : "Tắt máy",
+    "text" : "",
     "keybind" : "s"
 }
