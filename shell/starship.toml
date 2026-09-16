@@ -1,0 +1,40 @@
+# ~/.config/starship.toml — theme Catppuccin Mocha, đồng bộ với phần còn lại
+# của rice (waybar/hyprlock/wlogout/dunst/fuzzel/foot đều cùng bảng màu này).
+# Dùng mã màu hex trực tiếp — không dùng icon glyph phức tạp (powerline block)
+# để tránh rủi ro lệch font, tránh bài học đã gặp với icon waybar trước đó.
+
+format = """
+$directory\
+$git_branch\
+$git_status\
+$character"""
+
+[directory]
+style = "bold #89b4fa"
+format = "[$path]($style) "
+truncation_length = 3
+truncate_to_repo = true
+
+[git_branch]
+symbol = " "     # U+E0A0 — ký hiệu nhánh git chuẩn, có sẵn trong mọi Nerd Font
+style = "#cba6f7"
+format = "[$symbol$branch]($style) "
+
+[git_status]
+style = "#f38ba8"
+format = '([$all_status$ahead_behind]($style)) '
+
+[character]
+success_symbol = "[❯](bold #a6e3a1)"
+error_symbol = "[❯](bold #f38ba8)"
+
+[cmd_duration]
+min_time = 2000
+format = "took [$duration](#f9e2af) "
+
+# Không hiện user@host mặc định — terminal cá nhân, không cần nhắc lại mỗi dòng
+[username]
+show_always = false
+
+[hostname]
+disabled = true

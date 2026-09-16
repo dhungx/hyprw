@@ -1,4 +1,4 @@
-# My Hyprland Rice — bản hoàn chỉnh
+# hyprw
 
 Cấu hình đầy đủ: Hyprland (Lua, ≥0.55) + Waybar + hyprlock + hypridle + wlogout,
 theme Catppuccin Mocha đồng bộ. Tối ưu cho laptop Intel + NVIDIA RTX 3050 hybrid.
@@ -33,7 +33,16 @@ mkdir -p ~/.config/dunst ~/.config/fuzzel ~/.config/foot
 cp dunst/dunstrc      ~/.config/dunst/dunstrc
 cp fuzzel/fuzzel.ini  ~/.config/fuzzel/fuzzel.ini
 cp foot/foot.ini      ~/.config/foot/foot.ini
+
+cp shell/zshrc         ~/.zshrc
+cp shell/starship.toml ~/.config/starship.toml
 ```
+
+Đặt zsh làm shell mặc định (bắt buộc, không thì `.zshrc` không tự chạy khi mở terminal):
+```bash
+chsh -s /usr/bin/zsh
+```
+Đăng xuất/đăng nhập lại (hoặc mở terminal mới) để áp dụng.
 
 ## Cài package
 ```bash
@@ -41,7 +50,8 @@ sudo pacman -S hyprland waybar dunst hyprpaper hypridle hyprlock wlogout \
                foot thunar fuzzel cliphist \
                grim slurp wl-clipboard wireplumber brightnessctl playerctl \
                hyprpolkitagent qt6ct nwg-look papirus-icon-theme networkmanager \
-               ttf-jetbrains-mono-nerd fastfetch
+               ttf-jetbrains-mono-nerd fastfetch \
+               zsh zsh-autosuggestions zsh-syntax-highlighting starship
 
 # Theme GTK (AUR — cần paru/yay)
 paru -S catppuccin-gtk-theme-blue
@@ -116,6 +126,10 @@ gtk-3.0, gtk-4.0/     — đồng bộ theme cho app GTK
   Shell, WM, Terminal, CPU, GPU, Memory, Disk
 - `dunst`, `fuzzel`, `foot` đã có theme Catppuccin Mocha riêng (trước đây có
   cài nhưng chưa có config — sẽ hiện giao diện mặc định nếu thiếu 3 file này)
+- zsh dùng `zsh-autosuggestions` + `zsh-syntax-highlighting` (source đúng
+  path pacman cài, tự bỏ qua nếu chưa cài, không lỗi) + prompt `starship`
+  theme cùng bảng màu. Nhớ chạy `chsh -s /usr/bin/zsh` — chỉ cài package
+  không tự đổi shell mặc định
 - Blur/animation đã bật sẵn (RTX 3050 dư sức) — muốn tắt cho nhẹ hơn nữa, sửa
   `blur.enabled = false` trong `hyprland.lua`
 - hypridle tự tạm dừng khi trình duyệt/video player đang phát video hoặc game
