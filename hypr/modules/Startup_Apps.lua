@@ -11,6 +11,7 @@ hl.on("hyprland.start", function()
     -- đây là lần vẽ đầu tiên, chưa có gì để "chuyển từ" nên không cần animation
     hl.exec_cmd("sleep 0.5 && awww img ~/.config/hypr/wallpapers/current.jpg --transition-type none")
     hl.exec_cmd("hypridle")
+    hl.exec_cmd("fcitx5 -d --replace")   -- gõ tiếng Việt, -d chạy nền, --replace tránh chạy trùng
     hl.exec_cmd("dunst")
     hl.exec_cmd("/usr/lib/polkit-kde-authentication-agent-1")
     hl.exec_cmd("wl-paste --watch cliphist store")   -- nạp clipboard history nền

@@ -36,6 +36,10 @@ mkdir -p ~/.config/btop/themes
 cp btop/btop.conf ~/.config/btop/btop.conf
 cp btop/themes/catppuccin_mocha.theme ~/.config/btop/themes/catppuccin_mocha.theme
 
+mkdir -p ~/.config/fcitx5
+cp fcitx5/config  ~/.config/fcitx5/config
+cp fcitx5/profile ~/.config/fcitx5/profile
+
 mkdir -p ~/.config/dunst ~/.config/fuzzel ~/.config/foot
 cp dunst/dunstrc      ~/.config/dunst/dunstrc
 cp fuzzel/fuzzel.ini  ~/.config/fuzzel/fuzzel.ini
@@ -64,6 +68,7 @@ sudo pacman -S hyprland waybar dunst awww hypridle hyprlock wlogout \
                grim slurp wl-clipboard wireplumber brightnessctl playerctl \
                hyprpolkitagent qt5ct qt6ct nwg-look papirus-icon-theme networkmanager \
                ttf-jetbrains-mono-nerd fastfetch btop \
+               fcitx5 fcitx5-unikey fcitx5-gtk fcitx5-qt fcitx5-configtool \
                zsh zsh-autosuggestions zsh-syntax-highlighting starship
 
 # Theme GTK (AUR — cần paru/yay)
@@ -101,8 +106,10 @@ hypr/modules/         — Monitors, ENVariables, Startup_Apps, LookAndFeel,
                         đúng file đó, không cần đụng hyprland.lua)
 hypr/hypridle.conf    — quản lý idle/khoá máy tự động (định dạng riêng, không Lua)
 hypr/hyprlock.conf    — giao diện màn hình khoá (định dạng riêng, không Lua)
-hypr/scripts/         — wallpaper-select.sh (Super+W, xem phần Wallpaper)
+hypr/scripts/         — wallpaper-select.sh (Super+W), ime-select.sh (Super+Shift+Space),
+                        osd-volume.sh + osd-brightness.sh (popup % khi chỉnh phím media)
 btop/                 — resource monitor theme Catppuccin Mocha, alias thay htop
+fcitx5/               — gõ tiếng Việt (Unikey) + tiếng Anh
 wallpaper/            — 8 ảnh nền có sẵn, copy sang ~/.config/hypr/wallpapers/
 waybar/               — thanh bar
 wlogout/              — menu nguồn (khoá/đăng xuất/tắt máy)
@@ -124,6 +131,8 @@ gtk-3.0, gtk-4.0/     — đồng bộ theme cho app GTK
 | Super+M | Menu nguồn (wlogout) |
 | Super+C | Clipboard history |
 | Super+W | **Đổi wallpaper runtime** — mở picker, chọn ảnh, chuyển có animation ngay, không cần sửa file/reload |
+| Super+Space | **Đổi nhanh Anh ↔ Việt** (fcitx5 xử lý trực tiếp, hoạt động mọi app) |
+| Super+Shift+Space | **Mở bảng chọn ngôn ngữ gõ cụ thể** (menu fuzzel) |
 | Super+trái/phải/lên/xuống | Di chuyển focus |
 | Super+1..0 | Chuyển workspace |
 | Super+Shift+1..0 | Đẩy cửa sổ qua workspace khác |
@@ -186,6 +195,19 @@ gtk-3.0, gtk-4.0/     — đồng bộ theme cho app GTK
   — biến dùng chung (`terminal`, `mainMod`...) nằm ở `modules/shared.lua`,
   module nào cần thì tự `require("modules.shared")`, không tự thấy biến
   của file khác
+- **OSD volume/brightness:** dùng thẳng `dunst` đã cài sẵn (`dunstify -h
+  int:value:N`) để vẽ progress bar thật trong notification — không cần cài
+  thêm package OSD riêng (swayosd, wob...). Cờ `-r <id cố định>` trong 2
+  script làm notification mới đè lên cũ thay vì xếp chồng khi bấm liên tục
+- **Gõ tiếng Việt:** `fcitx5/profile` đã khai sẵn 2 IME (`keyboard-us` +
+  `unikey`), không cần tự mở `fcitx5-configtool` thêm tay. `Super+space` đổi
+  nhanh 2 chiều (do chính fcitx5 xử lý qua `Hotkey/TriggerKeys`, hoạt động ở
+  mọi app kể cả khi Hyprland không cần biết). `Super+Shift+Space` mở menu
+  fuzzel chọn thẳng ngôn ngữ, dùng `fcitx5-remote -s <tên>` phía sau. Nếu sau
+  khi cài gõ tiếng Việt không lên (tên IME `unikey` có thể lệch giữa các bản
+  đóng gói), mở `fcitx5-configtool` 1 lần, vào tab Input Method xem tên chính
+  xác Unikey hiện ra là gì rồi sửa lại `fcitx5/profile` + `ime-select.sh` cho
+  khớp
 - **`btop`** thay `htop`/`top` — file theme lấy nguyên văn từ repo chính thức
   `catppuccin/btop` (không tự đoán màu), alias `htop`/`top` trong `.zshrc` đã
   trỏ sang `btop` luôn nên gõ thói quen cũ vẫn ra đúng app mới

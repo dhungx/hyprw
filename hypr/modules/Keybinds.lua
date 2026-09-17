@@ -20,6 +20,11 @@ hl.bind(mainMod .. " + M", hl.dsp.exec_cmd("wlogout"))
 -- (cần cài: awww — xem scripts/wallpaper-select.sh)
 hl.bind(mainMod .. " + W", hl.dsp.exec_cmd("~/.config/hypr/scripts/wallpaper-select.sh"))
 
+-- Gõ tiếng Việt: Super+Space (đổi nhanh 2 chiều) do fcitx5 tự xử lý, không
+-- cần bind ở đây — xem fcitx5/config. Super+Shift+Space mở bảng chọn thẳng
+-- ngôn ngữ cụ thể (cần cài: fcitx5-unikey — xem scripts/ime-select.sh)
+hl.bind(mainMod .. " + SHIFT + SPACE", hl.dsp.exec_cmd("~/.config/hypr/scripts/ime-select.sh"))
+
 -- Di chuyển focus
 hl.bind(mainMod .. " + left", hl.dsp.focus({ direction = "left" }))
 hl.bind(mainMod .. " + right", hl.dsp.focus({ direction = "right" }))
@@ -53,11 +58,12 @@ hl.bind("", "PRINT", hl.dsp.exec_cmd("grim -g \"$(slurp)\" - | wl-copy"))
 hl.bind(mainMod .. " + PRINT", hl.dsp.exec_cmd("grim - | wl-copy"))   -- chụp toàn màn hình
 
 -- Volume / Brightness (locked+repeating = giữ phím vẫn tăng/giảm liên tục)
-hl.bind("XF86AudioRaiseVolume", hl.dsp.exec_cmd("wpctl set-volume -l 1 @DEFAULT_AUDIO_SINK@ 5%+"), { locked = true, repeating = true })
-hl.bind("XF86AudioLowerVolume", hl.dsp.exec_cmd("wpctl set-volume @DEFAULT_AUDIO_SINK@ 5%-"), { locked = true, repeating = true })
-hl.bind("XF86AudioMute", hl.dsp.exec_cmd("wpctl set-mute @DEFAULT_AUDIO_SINK@ toggle"), { locked = true })
-hl.bind("XF86MonBrightnessUp", hl.dsp.exec_cmd("brightnessctl -e4 -n2 set 5%+"), { locked = true, repeating = true })
-hl.bind("XF86MonBrightnessDown", hl.dsp.exec_cmd("brightnessctl -e4 -n2 set 5%-"), { locked = true, repeating = true })
+-- Gọi qua script osd-*.sh để vừa chỉnh vừa hiện popup % (xem scripts/)
+hl.bind("XF86AudioRaiseVolume", hl.dsp.exec_cmd("~/.config/hypr/scripts/osd-volume.sh up"), { locked = true, repeating = true })
+hl.bind("XF86AudioLowerVolume", hl.dsp.exec_cmd("~/.config/hypr/scripts/osd-volume.sh down"), { locked = true, repeating = true })
+hl.bind("XF86AudioMute", hl.dsp.exec_cmd("~/.config/hypr/scripts/osd-volume.sh mute"), { locked = true })
+hl.bind("XF86MonBrightnessUp", hl.dsp.exec_cmd("~/.config/hypr/scripts/osd-brightness.sh up"), { locked = true, repeating = true })
+hl.bind("XF86MonBrightnessDown", hl.dsp.exec_cmd("~/.config/hypr/scripts/osd-brightness.sh down"), { locked = true, repeating = true })
 
 -- Media keys (cần cài: playerctl)
 hl.bind("XF86AudioNext", hl.dsp.exec_cmd("playerctl next"), { locked = true })

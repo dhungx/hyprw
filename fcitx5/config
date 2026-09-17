@@ -1,0 +1,12 @@
+# fcitx5 global config — chỉ override phần Hotkey, các phần khác fcitx5 tự
+# điền mặc định hợp lý khi chạy lần đầu, không cần liệt kê hết.
+
+[Hotkey]
+EnumerateWithTriggerKeys=True
+EnumerateSkipFirst=False
+
+[Hotkey/TriggerKeys]
+0=Super+space
+
+[Hotkey/AltTriggerKeys]
+0=Shift_L

@@ -1,0 +1,19 @@
+# fcitx5 profile — định nghĩa sẵn 1 group "Default" gồm 2 IME: bàn phím Anh
+# (keyboard-us) và Unikey tiếng Việt. Không cần tự mở fcitx5-configtool để
+# thêm tay — cắm là dùng được Super+space để đổi qua lại luôn.
+
+[Groups]
+0=Default
+DefaultGroup=Default
+
+[Groups/0]
+Name=Default
+Default Layout=us
+DefaultIM=keyboard-us
+
+[Groups/0/Items]
+0=keyboard-us
+1=unikey
+
+[GroupOrder]
+0=Default

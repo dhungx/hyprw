@@ -12,6 +12,12 @@ hl.env("QT_QPA_PLATFORMTHEME", "qt5ct")
 hl.env("QT_QPA_PLATFORM", "wayland;xcb")           -- ưu tiên Wayland, dự phòng XWayland
 hl.env("QT_WAYLAND_DISABLE_WINDOWDECORATION", "1") -- tránh app Qt tự vẽ thanh title xấu
 
+-- Gõ tiếng Việt (fcitx5 + Unikey) — cần cho GTK/Qt/SDL nhận đúng input method
+hl.env("GTK_IM_MODULE", "fcitx")
+hl.env("QT_IM_MODULE", "fcitx")
+hl.env("XMODIFIERS", "@im=fcitx")
+hl.env("SDL_IM_MODULE", "fcitx")
+
 -- ── Tối ưu GPU cho laptop hybrid (Intel iGPU + NVIDIA RTX 3050) ──
 -- iHD = giải mã video bằng iGPU Intel, tiết kiệm pin, không giành VRAM với NVIDIA.
 -- Dùng `prime-run <lệnh>` để ép app/game chạy bằng GPU rời khi cần hiệu năng.
