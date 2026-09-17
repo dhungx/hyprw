@@ -1,5 +1,5 @@
 /* ══════════════════════════════════════════════
-   WAYBAR STYLE — Catppuccin Mocha, đồng bộ với hyprland.lua/hyprlock/wlogout
+   WAYBAR STYLE — Catppuccin Mocha, bản "gọn động"
    ══════════════════════════════════════════════ */
 
 * {
@@ -32,26 +32,60 @@ window#waybar {
     color: #f9e2af;
 }
 
-#clock {
-    font-weight: bold;
+/* ══ Mỗi group (clock/cpu/memory/pulseaudio/network/battery) là 1
+   "viên thuốc" — nền bo góc, đậm hơn khi hover để báo có thể mở rộng.
+   Waybar tự vẽ animation trượt của phần "#full" bên trong bằng
+   GtkRevealer (theo "transition-duration" đã khai trong config.jsonc);
+   phần CSS dưới đây chỉ lo hình dáng/màu, không đụng vào animation. ══ */
+#group-clock-drawer,
+#group-cpu-drawer,
+#group-mem-drawer,
+#group-vol-drawer,
+#group-net-drawer,
+#group-bat-drawer {
+    background-color: rgba(49, 50, 68, 0.6);
+    border-radius: 6px;
+    margin: 4px 2px;
     padding: 0 10px;
+    transition: background-color 200ms ease;
+}
+#group-clock-drawer:hover,
+#group-cpu-drawer:hover,
+#group-mem-drawer:hover,
+#group-vol-drawer:hover,
+#group-net-drawer:hover,
+#group-bat-drawer:hover {
+    background-color: rgba(49, 50, 68, 0.9);
 }
 
-#cpu,
-#memory,
-#pulseaudio,
-#network,
-#battery,
-#tray,
+#clock.short {
+    font-weight: bold;
+}
+
+/* Phần ".full" (ẩn mặc định, trượt ra khi hover) — làm nhạt màu hơn
+   1 chút so với phần "short" để phân biệt "số liệu chính" và "số liệu
+   phụ mở rộng", đồng thời tạo khoảng cách khi nó trượt ra. */
+#clock.full,
+#cpu.full,
+#memory.full,
+#pulseaudio.full,
+#network.full,
+#battery.full {
+    margin-left: 8px;
+    color: #a6adc8;
+}
+
+#tray {
+    padding: 0 8px;
+}
+
 #custom-power {
     padding: 0 10px;
     margin: 4px 2px;
-    background-color: rgba(49, 50, 68, 0.6);
     border-radius: 6px;
-}
-
-#custom-power {
+    background-color: rgba(49, 50, 68, 0.6);
     color: #f38ba8;
+    transition: background-color 200ms ease, color 200ms ease;
 }
 #custom-power:hover {
     background-color: #f38ba8;

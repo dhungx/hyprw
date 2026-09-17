@@ -1,8 +1,13 @@
 // ══════════════════════════════════════════════
-// WAYBAR CONFIG — bản "rice" hoàn chỉnh
-// Icon Nerd Font, đã đối chiếu trực tiếp với dữ liệu gốc
-// github.com/ryanoasis/nerd-fonts (glyph-names.json / cheat sheet chính thức)
-// — không dùng icon đoán từ trí nhớ.
+// WAYBAR CONFIG — bản "gọn động" (hover-to-reveal)
+// Dùng tính năng "drawer" CHÍNH THỨC của waybar cho group module
+// (xem: man waybar, mục "group"). Waybar tự vẽ animation trượt bằng
+// GtkRevealer nội bộ — KHÔNG cần CSS keyframes, KHÔNG cần script/daemon
+// phụ, KHÔNG tốn thêm tài nguyên đáng kể so với hiện đủ số liệu luôn.
+//
+// Mỗi cụm (clock/cpu/memory/pulseaudio/network/battery) giờ là 1
+// "group" gồm 2 phần tử: "#short" (luôn hiện) và "#full" (ẩn, chỉ
+// trượt ra khi hover đúng cụm đó).
 // ══════════════════════════════════════════════
 {
     "layer": "top",
@@ -11,8 +16,16 @@
     "spacing": 4,
 
     "modules-left": ["hyprland/workspaces", "idle_inhibitor"],
-    "modules-center": ["clock"],
-    "modules-right": ["cpu", "memory", "pulseaudio", "network", "battery", "tray", "custom/power"],
+    "modules-center": ["group/clock-drawer"],
+    "modules-right": [
+        "group/cpu-drawer",
+        "group/mem-drawer",
+        "group/vol-drawer",
+        "group/net-drawer",
+        "group/bat-drawer",
+        "tray",
+        "custom/power"
+    ],
 
     "hyprland/workspaces": {
         "format": "{icon}",
@@ -26,56 +39,136 @@
     "idle_inhibitor": {
         "format": "{icon}",
         "format-icons": {
-            "activated": "\uf06e",     // nf-fa-eye
-            "deactivated": "\uf070"    // nf-fa-eye_slash
+            "activated": "\uf06e",
+            "deactivated": "\uf070"
         }
     },
 
-    "clock": {
-        "format": "{:%H:%M  %d/%m/%Y}",
-        "tooltip-format": "{:%A, %d %B %Y}"
-    },
-
-    "cpu": {
-        "format": "\uf2db {usage}%",   // nf-fa-microchip
-        "interval": 3
-    },
-
-    "memory": {
-        "format": "\uefc5 {percentage}%",   // nf-fa-memory (đã sửa, mã cũ f538 sai)
-        "tooltip-format": "{used:0.1f}GB / {total:0.1f}GB"
-    },
-
-    // Icon đổi theo % volume thật: thấp → vừa → cao
-    "pulseaudio": {
-        "format": "{icon} {volume}%",
-        "format-muted": "\ueee8",   // nf-fa-volume_xmark (đã sửa, mã cũ f6a9 sai) — chỉ icon, bỏ chữ
-        "format-icons": {
-            "default": ["\uf026", "\uf027", "\uf028"]   // volume_off/down/up
+    // ══ Đồng hồ: gọn (giờ:phút) -> hover trượt ra thứ, ngày/tháng/năm ══
+    "group/clock-drawer": {
+        "orientation": "horizontal",
+        "drawer": {
+            "transition-duration": 350,
+            "children-class": "drawer-hidden"
         },
-        "on-click": "pavucontrol"
+        "modules": ["clock#short", "clock#full"]
+    },
+    "clock#short": {
+        "format": "{:%H:%M}",
+        "tooltip": false
+    },
+    "clock#full": {
+        "format": "{:%A, %d/%m/%Y}",
+        "tooltip": false
     },
 
-    // Icon WiFi chuẩn (hình quạt sóng, Material Design Icons) — 4 mức,
-    // đổi đúng theo cường độ tín hiệu thật. Mã U+F091F/F0922/F0925/F0928,
-    // đã xác minh chéo qua nhiều nguồn độc lập trước khi chèn.
-    "network": {
-        "format-wifi": "{icon} {signalStrength}%",
-        "format-ethernet": "\uef44 {ipaddr}",   // nf-fa-ethernet (đã sửa, mã cũ f796 sai)
+    // ══ CPU: chỉ icon -> hover hiện % + tần số trung bình ══
+    "group/cpu-drawer": {
+        "orientation": "horizontal",
+        "drawer": {
+            "transition-duration": 300,
+            "children-class": "drawer-hidden"
+        },
+        "modules": ["cpu#short", "cpu#full"]
+    },
+    "cpu#short": {
+        "format": "\uf2db",   // nf-fa-microchip
+        "interval": 3,
+        "tooltip": false
+    },
+    "cpu#full": {
+        "format": "{usage}% · {avg_frequency:0.1f}GHz",
+        "interval": 3,
+        "tooltip": false
+    },
+
+    // ══ RAM: chỉ icon -> hover hiện used/total GB ══
+    "group/mem-drawer": {
+        "orientation": "horizontal",
+        "drawer": {
+            "transition-duration": 300,
+            "children-class": "drawer-hidden"
+        },
+        "modules": ["memory#short", "memory#full"]
+    },
+    "memory#short": {
+        "format": "\uefc5",   // nf-fa-memory
+        "tooltip": false
+    },
+    "memory#full": {
+        "format": "{used:0.1f}GB / {total:0.1f}GB",
+        "tooltip": false
+    },
+
+    // ══ Âm lượng: icon đổi theo mức thật -> hover hiện số % ══
+    "group/vol-drawer": {
+        "orientation": "horizontal",
+        "drawer": {
+            "transition-duration": 300,
+            "children-class": "drawer-hidden"
+        },
+        "modules": ["pulseaudio#short", "pulseaudio#full"]
+    },
+    "pulseaudio#short": {
+        "format": "{icon}",
+        "format-muted": "\ueee8",
+        "format-icons": {
+            "default": ["\uf026", "\uf027", "\uf028"]
+        },
+        "tooltip": false
+    },
+    "pulseaudio#full": {
+        "format": "{volume}%",
+        "format-muted": "Tắt tiếng",
+        "on-click": "pavucontrol",
+        "tooltip": false
+    },
+
+    // ══ Mạng: icon sóng đổi theo cường độ thật -> hover hiện tên WiFi + % ══
+    "group/net-drawer": {
+        "orientation": "horizontal",
+        "drawer": {
+            "transition-duration": 300,
+            "children-class": "drawer-hidden"
+        },
+        "modules": ["network#short", "network#full"]
+    },
+    "network#short": {
+        "format-wifi": "{icon}",
+        "format-ethernet": "\uef44",
         "format-disconnected": "󰤭",
         "format-icons": ["󰤟", "󰤢", "󰤥", "󰤨"],
-        "tooltip-format": "{ifname}: {ipaddr}"
+        "tooltip": false
+    },
+    "network#full": {
+        "format-wifi": "{essid} {signalStrength}%",
+        "format-ethernet": "{ipaddr}",
+        "format-disconnected": "Mất mạng",
+        "tooltip": false
     },
 
-    // Icon pin đổi theo đúng % thật: rỗng → 1/4 → nửa → 3/4 → đầy
-    "battery": {
-        "format": "{icon} {capacity}%",
-        "format-charging": "\uf0e7 {capacity}%",   // nf-fa-bolt khi đang sạc
+    // ══ Pin: icon đổi theo % thật -> hover hiện % + thời gian còn lại ══
+    "group/bat-drawer": {
+        "orientation": "horizontal",
+        "drawer": {
+            "transition-duration": 300,
+            "children-class": "drawer-hidden"
+        },
+        "modules": ["battery#short", "battery#full"]
+    },
+    "battery#short": {
+        "format": "{icon}",
+        "format-charging": "\uf0e7",
         "format-icons": ["\uf244", "\uf243", "\uf242", "\uf241", "\uf240"],
-        "states": {
-            "warning": 20,
-            "critical": 10
-        }
+        "states": { "warning": 20, "critical": 10 },
+        "tooltip": false
+    },
+    "battery#full": {
+        "format": "{capacity}%",
+        "format-charging": "{capacity}% · đang sạc",
+        "format-time": "{H}h{M}p",
+        "states": { "warning": 20, "critical": 10 },
+        "tooltip": false
     },
 
     "tray": {
@@ -83,7 +176,7 @@
     },
 
     "custom/power": {
-        "format": "\uf011",   // nf-fa-power_off
+        "format": "\uf011",
         "on-click": "wlogout",
         "tooltip": false
     }
