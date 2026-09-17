@@ -16,7 +16,9 @@ cp hypr/hyprland.lua   ~/.config/hypr/hyprland.lua
 cp -r hypr/modules     ~/.config/hypr/modules
 cp hypr/hypridle.conf  ~/.config/hypr/hypridle.conf
 cp hypr/hyprlock.conf  ~/.config/hypr/hyprlock.conf
-cp hypr/hyprpaper.conf ~/.config/hypr/hyprpaper.conf
+
+cp -r hypr/scripts ~/.config/hypr/scripts
+chmod +x ~/.config/hypr/scripts/*.sh
 
 cp waybar/config.jsonc ~/.config/waybar/config.jsonc
 cp waybar/style.css    ~/.config/waybar/style.css
@@ -29,6 +31,10 @@ cp gtk-4.0/settings.ini ~/.config/gtk-4.0/settings.ini
 
 mkdir -p ~/.config/fastfetch
 cp fastfetch/config.jsonc ~/.config/fastfetch/config.jsonc
+
+mkdir -p ~/.config/btop/themes
+cp btop/btop.conf ~/.config/btop/btop.conf
+cp btop/themes/catppuccin_mocha.theme ~/.config/btop/themes/catppuccin_mocha.theme
 
 mkdir -p ~/.config/dunst ~/.config/fuzzel ~/.config/foot
 cp dunst/dunstrc      ~/.config/dunst/dunstrc
@@ -53,11 +59,11 @@ chsh -s /usr/bin/zsh
 
 ## Cài package
 ```bash
-sudo pacman -S hyprland waybar dunst hyprpaper hypridle hyprlock wlogout \
+sudo pacman -S hyprland waybar dunst awww hypridle hyprlock wlogout \
                foot thunar fuzzel cliphist \
                grim slurp wl-clipboard wireplumber brightnessctl playerctl \
                hyprpolkitagent qt5ct qt6ct nwg-look papirus-icon-theme networkmanager \
-               ttf-jetbrains-mono-nerd fastfetch \
+               ttf-jetbrains-mono-nerd fastfetch btop \
                zsh zsh-autosuggestions zsh-syntax-highlighting starship
 
 # Theme GTK (AUR — cần paru/yay)
@@ -65,9 +71,15 @@ paru -S catppuccin-gtk-theme-blue
 ```
 
 ## Việc cần làm sau khi cài
-1. **Ảnh nền:** `cp -r wallpaper ~/.config/hypr/wallpapers` — 8 ảnh có sẵn, mặc định
-   dùng `river_to_castle_theme_blue.jpeg`. Đổi ảnh khác thì sửa path trong cả
-   `hyprpaper.conf` và `hyprlock.conf` (2 chỗ, phải khớp nhau)
+1. **Ảnh nền:** `cp -r wallpaper ~/.config/hypr/wallpapers` — 8 ảnh có sẵn. Tạo
+   symlink `current.jpg` trỏ vào 1 ảnh làm mặc định (Startup_Apps.lua cần file
+   này tồn tại lúc khởi động):
+   ```bash
+   ln -sfn ~/.config/hypr/wallpapers/river_to_castle_theme_blue.jpeg \
+           ~/.config/hypr/wallpapers/current.jpg
+   ```
+   Sau đó đổi wallpaper bất cứ lúc nào bằng `Super+W` — không cần sửa file
+   này bằng tay nữa, script tự cập nhật
 2. **Màn hình 144Hz:** `hyprctl monitors` lấy tên thật, sửa khối `hl.monitor({...})`
    trong `~/.config/hypr/modules/Monitors.lua`
 3. ~~Theme Qt~~ — đã cấu hình sẵn, không cần chạy `qt6ct` GUI thủ công nữa
@@ -89,7 +101,8 @@ hypr/modules/         — Monitors, ENVariables, Startup_Apps, LookAndFeel,
                         đúng file đó, không cần đụng hyprland.lua)
 hypr/hypridle.conf    — quản lý idle/khoá máy tự động (định dạng riêng, không Lua)
 hypr/hyprlock.conf    — giao diện màn hình khoá (định dạng riêng, không Lua)
-hypr/hyprpaper.conf   — hình nền
+hypr/scripts/         — wallpaper-select.sh (Super+W, xem phần Wallpaper)
+btop/                 — resource monitor theme Catppuccin Mocha, alias thay htop
 wallpaper/            — 8 ảnh nền có sẵn, copy sang ~/.config/hypr/wallpapers/
 waybar/               — thanh bar
 wlogout/              — menu nguồn (khoá/đăng xuất/tắt máy)
@@ -110,6 +123,7 @@ gtk-3.0, gtk-4.0/     — đồng bộ theme cho app GTK
 | Super+L | Khoá máy |
 | Super+M | Menu nguồn (wlogout) |
 | Super+C | Clipboard history |
+| Super+W | **Đổi wallpaper runtime** — mở picker, chọn ảnh, chuyển có animation ngay, không cần sửa file/reload |
 | Super+trái/phải/lên/xuống | Di chuyển focus |
 | Super+1..0 | Chuyển workspace |
 | Super+Shift+1..0 | Đẩy cửa sổ qua workspace khác |
@@ -155,6 +169,16 @@ gtk-3.0, gtk-4.0/     — đồng bộ theme cho app GTK
   ngược lại sẽ làm app Qt5 mất theme. Cả 2 đã có sẵn `qt5ct.conf`/`qt6ct.conf`
   + file màu Catppuccin Mocha khớp đúng bảng màu dùng xuyên suốt rice, không
   cần tự mở GUI chỉnh tay
+- **Đổi wallpaper runtime (Super+W):** dùng `awww` thay `hyprpaper` — hyprpaper
+  không hỗ trợ animation chuyển cảnh, đổi tức thì. `awww` là bản đổi tên của
+  `swww` (đổi tên 10/2025, chuyển qua Codeberg) — trên Arch hiện tại package
+  tên `swww` sẽ tự trỏ sang `awww`, nhưng lệnh thật là `awww`/`awww-daemon`,
+  KHÔNG phải `swww`/`swww-daemon`. Script trong repo này đã dùng đúng tên mới.
+  Về an toàn tài nguyên: `awww img` chỉ gửi lệnh cho `awww-daemon` (vốn chạy
+  nền sẵn để hiện wallpaper tĩnh, không phải process mới) rồi thoát ngay —
+  animation chạy đúng trong khoảng `--transition-duration` (1.2s) bên trong
+  daemon đó rồi tự về trạng thái idle bình thường, không có gì bị bỏ lại chạy
+  thêm sau khi chuyển xong
 - Cấu hình Hyprland đã chia theo module (`hypr/modules/`), giống kiểu
   JaKooLit/KooL — sửa gì thì mở đúng file đó (`Keybinds.lua` cho phím tắt,
   `WindowRules.lua` cho window rules...), `hyprland.lua` chỉ còn
@@ -162,6 +186,9 @@ gtk-3.0, gtk-4.0/     — đồng bộ theme cho app GTK
   — biến dùng chung (`terminal`, `mainMod`...) nằm ở `modules/shared.lua`,
   module nào cần thì tự `require("modules.shared")`, không tự thấy biến
   của file khác
+- **`btop`** thay `htop`/`top` — file theme lấy nguyên văn từ repo chính thức
+  `catppuccin/btop` (không tự đoán màu), alias `htop`/`top` trong `.zshrc` đã
+  trỏ sang `btop` luôn nên gõ thói quen cũ vẫn ra đúng app mới
 - Blur/animation đã bật sẵn (RTX 3050 dư sức) — muốn tắt cho nhẹ hơn nữa, sửa
   `blur.enabled = false` trong `hypr/modules/LookAndFeel.lua`
 - hypridle tự tạm dừng khi trình duyệt/video player đang phát video hoặc game

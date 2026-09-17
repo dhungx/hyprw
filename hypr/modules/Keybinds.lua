@@ -16,6 +16,10 @@ hl.bind(mainMod .. " + F", hl.dsp.exec_cmd("hyprctl dispatch fullscreen 0"))
 hl.bind(mainMod .. " + L", hl.dsp.exec_cmd(shared.lockCmd))
 hl.bind(mainMod .. " + M", hl.dsp.exec_cmd("wlogout"))
 
+-- Đổi wallpaper ngay lúc dùng máy, có animation, không cần sửa file/reload
+-- (cần cài: awww — xem scripts/wallpaper-select.sh)
+hl.bind(mainMod .. " + W", hl.dsp.exec_cmd("~/.config/hypr/scripts/wallpaper-select.sh"))
+
 -- Di chuyển focus
 hl.bind(mainMod .. " + left", hl.dsp.focus({ direction = "left" }))
 hl.bind(mainMod .. " + right", hl.dsp.focus({ direction = "right" }))

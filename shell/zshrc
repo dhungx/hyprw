@@ -35,6 +35,8 @@ alias grep='grep --color=auto'
 alias update='sudo pacman -Syu'
 alias cleanup='sudo pacman -Rns $(pacman -Qtdq)'   # xoá package mồ côi không ai cần
 alias hyprreload='hyprctl reload'
+alias htop='btop'    # dùng btop thay htop, đã theme sẵn Catppuccin Mocha
+alias top='btop'
 
 # ── Plugin: autosuggestions ────────────────────
 # Gợi ý lệnh mờ dựa theo lịch sử — bấm → (phím mũi tên phải) để nhận gợi ý
