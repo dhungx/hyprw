@@ -45,38 +45,43 @@
     },
 
     // ══ Đồng hồ: gọn (giờ:phút) -> hover trượt ra thứ, ngày/tháng/năm ══
+    // "clock" (không hậu tố) = group leader, LUÔN hiện — đúng quy tắc chính
+    // thức: "phần tử đầu tiên trong mảng modules là leader, không bao giờ ẩn".
+    // "clock#detail" = phần tử ẩn, chỉ trượt ra khi hover cả group.
     "group/clock-drawer": {
-        "orientation": "horizontal",
+        "orientation": "inherit",
         "drawer": {
             "transition-duration": 350,
-            "children-class": "drawer-hidden"
+            "children-class": "drawer-child",
+            "transition-left-to-right": false
         },
-        "modules": ["clock#short", "clock#full"]
+        "modules": ["clock", "clock#detail"]
     },
-    "clock#short": {
+    "clock": {
         "format": "{:%H:%M}",
         "tooltip": false
     },
-    "clock#full": {
+    "clock#detail": {
         "format": "{:%A, %d/%m/%Y}",
         "tooltip": false
     },
 
     // ══ CPU: chỉ icon -> hover hiện % + tần số trung bình ══
     "group/cpu-drawer": {
-        "orientation": "horizontal",
+        "orientation": "inherit",
         "drawer": {
             "transition-duration": 300,
-            "children-class": "drawer-hidden"
+            "children-class": "drawer-child",
+            "transition-left-to-right": false
         },
-        "modules": ["cpu#short", "cpu#full"]
+        "modules": ["cpu", "cpu#detail"]
     },
-    "cpu#short": {
+    "cpu": {
         "format": "\uf2db",   // nf-fa-microchip
         "interval": 3,
         "tooltip": false
     },
-    "cpu#full": {
+    "cpu#detail": {
         "format": "{usage}% · {avg_frequency:0.1f}GHz",
         "interval": 3,
         "tooltip": false
@@ -84,32 +89,34 @@
 
     // ══ RAM: chỉ icon -> hover hiện used/total GB ══
     "group/mem-drawer": {
-        "orientation": "horizontal",
+        "orientation": "inherit",
         "drawer": {
             "transition-duration": 300,
-            "children-class": "drawer-hidden"
+            "children-class": "drawer-child",
+            "transition-left-to-right": false
         },
-        "modules": ["memory#short", "memory#full"]
+        "modules": ["memory", "memory#detail"]
     },
-    "memory#short": {
+    "memory": {
         "format": "\uefc5",   // nf-fa-memory
         "tooltip": false
     },
-    "memory#full": {
+    "memory#detail": {
         "format": "{used:0.1f}GB / {total:0.1f}GB",
         "tooltip": false
     },
 
     // ══ Âm lượng: icon đổi theo mức thật -> hover hiện số % ══
     "group/vol-drawer": {
-        "orientation": "horizontal",
+        "orientation": "inherit",
         "drawer": {
             "transition-duration": 300,
-            "children-class": "drawer-hidden"
+            "children-class": "drawer-child",
+            "transition-left-to-right": false
         },
-        "modules": ["pulseaudio#short", "pulseaudio#full"]
+        "modules": ["pulseaudio", "pulseaudio#detail"]
     },
-    "pulseaudio#short": {
+    "pulseaudio": {
         "format": "{icon}",
         "format-muted": "\ueee8",
         "format-icons": {
@@ -117,7 +124,7 @@
         },
         "tooltip": false
     },
-    "pulseaudio#full": {
+    "pulseaudio#detail": {
         "format": "{volume}%",
         "format-muted": "Tắt tiếng",
         "on-click": "pavucontrol",
@@ -126,21 +133,22 @@
 
     // ══ Mạng: icon sóng đổi theo cường độ thật -> hover hiện tên WiFi + % ══
     "group/net-drawer": {
-        "orientation": "horizontal",
+        "orientation": "inherit",
         "drawer": {
             "transition-duration": 300,
-            "children-class": "drawer-hidden"
+            "children-class": "drawer-child",
+            "transition-left-to-right": false
         },
-        "modules": ["network#short", "network#full"]
+        "modules": ["network", "network#detail"]
     },
-    "network#short": {
+    "network": {
         "format-wifi": "{icon}",
         "format-ethernet": "\uef44",
         "format-disconnected": "󰤭",
         "format-icons": ["󰤟", "󰤢", "󰤥", "󰤨"],
         "tooltip": false
     },
-    "network#full": {
+    "network#detail": {
         "format-wifi": "{essid} {signalStrength}%",
         "format-ethernet": "{ipaddr}",
         "format-disconnected": "Mất mạng",
@@ -149,21 +157,22 @@
 
     // ══ Pin: icon đổi theo % thật -> hover hiện % + thời gian còn lại ══
     "group/bat-drawer": {
-        "orientation": "horizontal",
+        "orientation": "inherit",
         "drawer": {
             "transition-duration": 300,
-            "children-class": "drawer-hidden"
+            "children-class": "drawer-child",
+            "transition-left-to-right": false
         },
-        "modules": ["battery#short", "battery#full"]
+        "modules": ["battery", "battery#detail"]
     },
-    "battery#short": {
+    "battery": {
         "format": "{icon}",
         "format-charging": "\uf0e7",
         "format-icons": ["\uf244", "\uf243", "\uf242", "\uf241", "\uf240"],
         "states": { "warning": 20, "critical": 10 },
         "tooltip": false
     },
-    "battery#full": {
+    "battery#detail": {
         "format": "{capacity}%",
         "format-charging": "{capacity}% · đang sạc",
         "format-time": "{H}h{M}p",

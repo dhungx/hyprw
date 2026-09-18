@@ -58,19 +58,16 @@ window#waybar {
     background-color: rgba(49, 50, 68, 0.9);
 }
 
-#clock.short {
+#clock {
     font-weight: bold;
 }
 
-/* Phần ".full" (ẩn mặc định, trượt ra khi hover) — làm nhạt màu hơn
-   1 chút so với phần "short" để phân biệt "số liệu chính" và "số liệu
-   phụ mở rộng", đồng thời tạo khoảng cách khi nó trượt ra. */
-#clock.full,
-#cpu.full,
-#memory.full,
-#pulseaudio.full,
-#network.full,
-#battery.full {
+/* Phần chi tiết ẩn mặc định, chỉ trượt ra khi hover cả group — dùng
+   đúng "children-class" mà waybar chính thức gán cho MỌI phần tử ẩn
+   trong 1 drawer (xem config.jsonc, key "children-class": "drawer-child").
+   Đây là 1 class DÙNG CHUNG cho tất cả 6 group, không cần biết tên module
+   cụ thể bên trong — nguồn: wiki chính thức "Module: Group" của waybar. */
+.drawer-child {
     margin-left: 8px;
     color: #a6adc8;
 }

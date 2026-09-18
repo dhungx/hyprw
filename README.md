@@ -9,86 +9,41 @@ Nếu máy bạn đã có `~/.config/hypr/hyprland.conf` từ trước — **xo�
 chỉ dùng `hyprland.lua` trong bộ này.
 
 ## Cài vào máy
+Từ TTY (chưa cần vào GUI), clone repo rồi chạy đúng 1 file:
 ```bash
-mkdir -p ~/.config/hypr ~/.config/waybar ~/.config/wlogout ~/.config/gtk-3.0 ~/.config/gtk-4.0
+git clone <url-repo-của-bạn> hyprw
+cd hyprw
+chmod +x install.sh
+./install.sh
+```
+Script tự lo: cài package (pacman + AUR qua yay, tự bootstrap yay nếu chưa có),
+backup config cũ nếu có, copy `.config/` vào `~/.config/`, copy `zshrc` vào
+`~/.zshrc`, copy wallpaper + tạo symlink `current.jpg` mặc định, symlink theme
+GTK4, đặt zsh làm shell mặc định, cài session `hyprw` cho SDDM + bật SDDM.
+Xong thì `reboot` — ở màn hình đăng nhập SDDM, chọn session **"hyprw"** trước
+khi gõ mật khẩu (không phải "Hyprland" mặc định).
 
-cp hypr/hyprland.lua   ~/.config/hypr/hyprland.lua
-cp -r hypr/modules     ~/.config/hypr/modules
-cp hypr/hypridle.conf  ~/.config/hypr/hypridle.conf
-cp hypr/hyprlock.conf  ~/.config/hypr/hyprlock.conf
-
-cp -r hypr/scripts ~/.config/hypr/scripts
-chmod +x ~/.config/hypr/scripts/*.sh
-
-cp waybar/config.jsonc ~/.config/waybar/config.jsonc
-cp waybar/style.css    ~/.config/waybar/style.css
-
-cp wlogout/layout      ~/.config/wlogout/layout
-cp wlogout/style.css   ~/.config/wlogout/style.css
-
-cp gtk-3.0/settings.ini ~/.config/gtk-3.0/settings.ini
-cp gtk-4.0/settings.ini ~/.config/gtk-4.0/settings.ini
-
-mkdir -p ~/.config/fastfetch
-cp fastfetch/config.jsonc ~/.config/fastfetch/config.jsonc
-
-mkdir -p ~/.config/btop/themes
-cp btop/btop.conf ~/.config/btop/btop.conf
-cp btop/themes/catppuccin_mocha.theme ~/.config/btop/themes/catppuccin_mocha.theme
-
-mkdir -p ~/.config/fcitx5
-cp fcitx5/config  ~/.config/fcitx5/config
-cp fcitx5/profile ~/.config/fcitx5/profile
-
-mkdir -p ~/.config/dunst ~/.config/fuzzel ~/.config/foot
-cp dunst/dunstrc      ~/.config/dunst/dunstrc
-cp fuzzel/fuzzel.ini  ~/.config/fuzzel/fuzzel.ini
-cp foot/foot.ini      ~/.config/foot/foot.ini
-
-cp shell/zshrc         ~/.zshrc
-cp shell/starship.toml ~/.config/starship.toml
-
-mkdir -p ~/.config/xdg-desktop-portal
-cp xdg-desktop-portal/portals.conf ~/.config/xdg-desktop-portal/portals.conf
-
-cp -r qt5ct ~/.config/qt5ct
-cp -r qt6ct ~/.config/qt6ct
+Cấu trúc repo:
+```
+install.sh      — chạy 1 lần duy nhất lúc cài mới
+.config/        — copy y nguyên cấu trúc sang ~/.config/ (kể cả starship.toml,
+                   nằm trực tiếp trong .config/ vì đó đúng là đích thật của nó)
+zshrc           — KHÔNG nằm trong .config/ vì đích thật là ~/.zshrc, không phải
+                   ~/.config/zshrc — install.sh tự copy đúng chỗ
+wallpaper/      — để ngoài .config/ cho gọn repo (ảnh nặng, không phải "config"),
+                   install.sh tự copy vào ~/.config/hypr/wallpapers/ lúc cài
+sddm/           — session hyprw.desktop, install.sh tự cài vào
+                   /usr/share/wayland-sessions/ (thư mục hệ thống, không phải
+                   ~/.config nên tách riêng khỏi cây .config/ ở trên)
 ```
 
-Đặt zsh làm shell mặc định (bắt buộc, không thì `.zshrc` không tự chạy khi mở terminal):
-```bash
-chsh -s /usr/bin/zsh
-```
-Đăng xuất/đăng nhập lại (hoặc mở terminal mới) để áp dụng.
+Việc duy nhất **không** nằm trong `install.sh` (cố ý bỏ ngoài, rủi ro cao nếu
+tự động hoá sai): driver GPU, đặc biệt NVIDIA — cần cài sẵn trước khi chạy script.
 
-## Cài package
-```bash
-sudo pacman -S hyprland waybar dunst awww hypridle hyprlock wlogout \
-               foot thunar fuzzel cliphist \
-               grim slurp wl-clipboard wireplumber brightnessctl playerctl \
-               hyprpolkitagent qt5ct qt6ct nwg-look papirus-icon-theme networkmanager \
-               ttf-jetbrains-mono-nerd fastfetch btop \
-               fcitx5 fcitx5-unikey fcitx5-gtk fcitx5-qt fcitx5-configtool \
-               zsh zsh-autosuggestions zsh-syntax-highlighting starship
-
-# Theme GTK (AUR — cần paru/yay)
-paru -S catppuccin-gtk-theme-blue
-```
-
-## Việc cần làm sau khi cài
-1. **Ảnh nền:** `cp -r wallpaper ~/.config/hypr/wallpapers` — 8 ảnh có sẵn. Tạo
-   symlink `current.jpg` trỏ vào 1 ảnh làm mặc định (Startup_Apps.lua cần file
-   này tồn tại lúc khởi động):
-   ```bash
-   ln -sfn ~/.config/hypr/wallpapers/river_to_castle_theme_blue.jpeg \
-           ~/.config/hypr/wallpapers/current.jpg
-   ```
-   Sau đó đổi wallpaper bất cứ lúc nào bằng `Super+W` — không cần sửa file
-   này bằng tay nữa, script tự cập nhật
-2. **Màn hình 144Hz:** `hyprctl monitors` lấy tên thật, sửa khối `hl.monitor({...})`
+## Việc cần làm sau khi cài (không script hoá được, tuỳ máy mỗi người)
+1. **Màn hình 144Hz:** `hyprctl monitors` lấy tên thật, sửa khối `hl.monitor({...})`
    trong `~/.config/hypr/modules/Monitors.lua`
-3. ~~Theme Qt~~ — đã cấu hình sẵn, không cần chạy `qt6ct` GUI thủ công nữa
-4. **NVIDIA hybrid — tránh Electron app (Discord/VSCode/Chrome) treo máy lúc boot:**
+2. **NVIDIA hybrid — tránh Electron app (Discord/VSCode/Chrome) treo máy lúc boot:**
    sửa `/etc/mkinitcpio.conf`, dòng `MODULES=`, thêm `i915` **trước** các module
    nvidia:
    ```
@@ -146,6 +101,14 @@ gtk-3.0, gtk-4.0/     — đồng bộ theme cho app GTK
 | Phím Volume/Brightness/Media | Tự động, có sẵn |
 
 ## Ghi chú
+- **Đăng nhập:** cài xong chọn session **"hyprw"** ở màn hình SDDM (không
+  phải "Hyprland" mặc định) — `install.sh` đã tự cài file session + bật
+  SDDM, không cần làm gì thêm
+- **Bar dạng "gọn động":** cụm CPU/RAM/volume/mạng/pin mặc định chỉ hiện
+  icon — di chuột vào mới trượt ra số liệu đầy đủ (dùng tính năng
+  `group`+`drawer` chính thức của waybar, GtkRevealer vẽ animation, không
+  cần script/daemon phụ). Đồng hồ tương tự: gọn chỉ giờ:phút, hover ra
+  thứ/ngày/tháng. Đây là hành vi cố ý, không phải bar bị thiếu số liệu
 - Icon trên bar dùng glyph Nerd Font (không emoji) — cần font
   `ttf-jetbrains-mono-nerd` đã có trong danh sách cài ở trên. Mã icon đã đối
   chiếu trực tiếp với dữ liệu gốc `github.com/ryanoasis/nerd-fonts` (không
@@ -216,3 +179,13 @@ gtk-3.0, gtk-4.0/     — đồng bộ theme cho app GTK
 - hypridle tự tạm dừng khi trình duyệt/video player đang phát video hoặc game
   đang fullscreen (chuẩn Wayland idle-inhibit) — không cần lo màn hình tự khoá
   giữa lúc chơi game/xem phim với hầu hết app hiện đại
+- **Sửa lỗi khi viết `install.sh`:** README bản trước ghi gói `hyprpolkitagent`,
+  nhưng `Startup_Apps.lua` lại gọi thẳng đường dẫn
+  `/usr/lib/polkit-kde-authentication-agent-1` — đây là 2 package KHÁC NHAU
+  (`hyprpolkitagent` là agent tối giản riêng của Hyprland, nằm ở path khác).
+  Cài `hyprpolkitagent` theo README cũ thì dòng exec đó sẽ gọi vào file không
+  tồn tại → polkit không chạy, GUI xin quyền admin sẽ không hiện ra bao giờ.
+  `install.sh` đã sửa đúng thành gói `polkit-kde-agent` (khớp path thật đang
+  dùng). Gói `cliphist`, `playerctl`, `thunar`, `gvfs` cũng bị thiếu trong
+  danh sách cài ở README bản trước dù được dùng thật trong `Keybinds.lua`/
+  `shared.lua` — `install.sh` đã bổ sung đủ.

@@ -1,0 +1,6 @@
+[Desktop Entry]
+Name=hyprw
+Comment=Hyprland rice — theme Catppuccin Mocha, gõ tiếng Việt, wallpaper động
+Exec=start-hyprland
+Type=Application
+DesktopNames=Hyprland
