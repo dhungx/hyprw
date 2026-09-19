@@ -14,8 +14,9 @@ hl.config({
     decoration = {
         rounding = 8,
         rounding_power = 2,
-        active_opacity = 1.0,
-        inactive_opacity = 0.95,        -- cửa sổ không focus hơi mờ nhẹ — dấu hiệu "sạch" dễ nhận
+        active_opacity = 0.92,          -- cửa sổ đang dùng: trong suốt nhẹ, đủ thấy mờ phía sau
+        inactive_opacity = 0.85,        -- cửa sổ không focus: trong suốt rõ hơn 1 chút, dễ phân biệt đang dùng cái nào
+        fullscreen_opacity = 1.0,       -- fullscreen (video/game) LUÔN đặc — không áp dụng độ trong suốt ở trên
         shadow = {
             enabled = true,
             range = 4,

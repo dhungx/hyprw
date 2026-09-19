@@ -5,7 +5,8 @@
 
     "logo": {
         "type": "auto",
-        "source": "arch"
+        "source": "arch",
+        "position": "left"
     },
 
     "general": {

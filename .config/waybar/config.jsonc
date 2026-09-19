@@ -18,14 +18,27 @@
     "modules-left": ["hyprland/workspaces", "idle_inhibitor"],
     "modules-center": ["group/clock-drawer"],
     "modules-right": [
-        "group/cpu-drawer",
-        "group/mem-drawer",
-        "group/vol-drawer",
-        "group/net-drawer",
-        "group/bat-drawer",
-        "tray",
-        "custom/power"
+        "group/system-pill",
+        "tray"
     ],
+
+    // ══ Gộp cpu/ram/âm lượng/mạng/pin/nguồn vào CHUNG 1 viên thuốc — dùng
+    // group lồng trong group (Waybar hỗ trợ chính thức, xem PR #1589 "group
+    // module: configurable orientation" của Alexays/Waybar, bàn về hành vi
+    // "nested groups"). Mỗi group con bên trong vẫn giữ nguyên hành vi
+    // drawer/hover độc lập của riêng nó — chỉ gộp phần NỀN/hình dáng lại
+    // thành 1 khối liền bằng CSS (#group-system-pill), không đổi logic. ══
+    "group/system-pill": {
+        "orientation": "inherit",
+        "modules": [
+            "group/cpu-drawer",
+            "group/mem-drawer",
+            "group/vol-drawer",
+            "group/net-drawer",
+            "group/bat-drawer",
+            "custom/power"
+        ]
+    },
 
     "hyprland/workspaces": {
         "format": "{icon}",
@@ -77,12 +90,12 @@
         "modules": ["cpu", "cpu#detail"]
     },
     "cpu": {
-        "format": "\uf2db",   // nf-fa-microchip
+        "format": "\uf2db {usage}%",   // nf-fa-microchip + %
         "interval": 3,
         "tooltip": false
     },
     "cpu#detail": {
-        "format": "{usage}% · {avg_frequency:0.1f}GHz",
+        "format": "{avg_frequency:0.1f}GHz",
         "interval": 3,
         "tooltip": false
     },
@@ -98,7 +111,7 @@
         "modules": ["memory", "memory#detail"]
     },
     "memory": {
-        "format": "\uefc5",   // nf-fa-memory
+        "format": "\uefc5 {percentage}%",   // nf-fa-memory + %
         "tooltip": false
     },
     "memory#detail": {
@@ -166,15 +179,15 @@
         "modules": ["battery", "battery#detail"]
     },
     "battery": {
-        "format": "{icon}",
-        "format-charging": "\uf0e7",
+        "format": "{icon} {capacity}%",
+        "format-charging": "\uf0e7 {capacity}%",
         "format-icons": ["\uf244", "\uf243", "\uf242", "\uf241", "\uf240"],
         "states": { "warning": 20, "critical": 10 },
         "tooltip": false
     },
     "battery#detail": {
-        "format": "{capacity}%",
-        "format-charging": "{capacity}% · đang sạc",
+        "format": "còn lại {time}",
+        "format-charging": "đang sạc · {time} nữa đầy",
         "format-time": "{H}h{M}p",
         "states": { "warning": 20, "critical": 10 },
         "tooltip": false

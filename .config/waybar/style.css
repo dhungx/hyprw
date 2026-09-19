@@ -1,5 +1,8 @@
 /* ══════════════════════════════════════════════
-   WAYBAR STYLE — Catppuccin Mocha, bản "gọn động"
+   WAYBAR STYLE — Catppuccin Mocha
+   window#waybar trong suốt — không còn 1 dải nền chung.
+   3 viên thuốc độc lập: workspaces | đồng hồ | tray
+   1 viên thuốc GỘP: cpu + ram + âm lượng + mạng + pin + nút nguồn
    ══════════════════════════════════════════════ */
 
 * {
@@ -11,12 +14,34 @@
 }
 
 window#waybar {
-    background-color: rgba(30, 30, 46, 0.85);
+    background-color: transparent;
     color: #cdd6f4;
 }
 
+/* ══ Các viên thuốc ĐỘC LẬP: workspaces, đồng hồ, tray, và khối gộp
+   hệ thống (#group-system-pill). box-shadow nhẹ để đọc được chữ khi đè
+   lên ảnh nền sáng màu, vì không còn dải nền tối phía sau nữa. ══ */
+#workspaces,
+#group-clock-drawer,
+#idle_inhibitor,
+#group-system-pill,
+#tray {
+    background-color: rgba(30, 30, 46, 0.75);
+    border-radius: 999px;
+    margin: 6px 3px;
+    padding: 0 10px;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.35);
+    transition: background-color 200ms ease;
+}
+#group-clock-drawer:hover {
+    background-color: rgba(49, 50, 68, 0.95);
+}
+
+#workspaces {
+    padding: 0 4px;
+}
 #workspaces button {
-    padding: 0 8px;
+    padding: 0 6px;
     color: #6c7086;
     background: transparent;
 }
@@ -27,60 +52,58 @@ window#waybar {
     color: #cdd6f4;
 }
 
-#idle_inhibitor {
-    padding: 0 10px;
-    color: #f9e2af;
+#clock {
+    font-weight: bold;
 }
 
-/* ══ Mỗi group (clock/cpu/memory/pulseaudio/network/battery) là 1
-   "viên thuốc" — nền bo góc, đậm hơn khi hover để báo có thể mở rộng.
-   Waybar tự vẽ animation trượt của phần "#full" bên trong bằng
-   GtkRevealer (theo "transition-duration" đã khai trong config.jsonc);
-   phần CSS dưới đây chỉ lo hình dáng/màu, không đụng vào animation. ══ */
-#group-clock-drawer,
+/* ══ #group-system-pill = 1 viên thuốc GỘP chứa 6 phần con (cpu/ram/âm
+   lượng/mạng/pin/nguồn), dùng group lồng trong group (xem comment trong
+   config.jsonc). Padding hẹp hơn vì mỗi phần con đã tự có padding riêng. ══ */
+#group-system-pill {
+    padding: 0 4px;
+}
+
+/* 5 group con hover-drawer bên trong khối gộp — KHÔNG có nền/bo góc riêng
+   (nền đã gộp lên #group-system-pill), chỉ sáng nhẹ khi hover để biết
+   đang trỏ đúng phần nào trong khối, không tách rời hẳn thành pill riêng. */
 #group-cpu-drawer,
 #group-mem-drawer,
 #group-vol-drawer,
 #group-net-drawer,
 #group-bat-drawer {
-    background-color: rgba(49, 50, 68, 0.6);
-    border-radius: 6px;
-    margin: 4px 2px;
-    padding: 0 10px;
+    padding: 0 6px;
+    border-radius: 999px;
     transition: background-color 200ms ease;
 }
-#group-clock-drawer:hover,
 #group-cpu-drawer:hover,
 #group-mem-drawer:hover,
 #group-vol-drawer:hover,
 #group-net-drawer:hover,
 #group-bat-drawer:hover {
-    background-color: rgba(49, 50, 68, 0.9);
+    background-color: rgba(255, 255, 255, 0.08);
 }
 
-#clock {
-    font-weight: bold;
-}
-
-/* Phần chi tiết ẩn mặc định, chỉ trượt ra khi hover cả group — dùng
-   đúng "children-class" mà waybar chính thức gán cho MỌI phần tử ẩn
-   trong 1 drawer (xem config.jsonc, key "children-class": "drawer-child").
-   Đây là 1 class DÙNG CHUNG cho tất cả 6 group, không cần biết tên module
-   cụ thể bên trong — nguồn: wiki chính thức "Module: Group" của waybar. */
+/* Phần chi tiết ẩn mặc định, chỉ trượt ra khi hover cả group con — dùng
+   đúng "children-class" chính thức của waybar (xem config.jsonc, key
+   "children-class": "drawer-child"), dùng chung cho cả 6 group. */
 .drawer-child {
     margin-left: 8px;
     color: #a6adc8;
+}
+
+#idle_inhibitor {
+    color: #f9e2af;
 }
 
 #tray {
     padding: 0 8px;
 }
 
+/* Nút nguồn nằm trong khối gộp — không có nền riêng lúc thường, chỉ nổi
+   màu đỏ hồng nhẹ; hover thì tô đầy thành "chip" nhỏ trong lòng khối gộp. */
 #custom-power {
-    padding: 0 10px;
-    margin: 4px 2px;
-    border-radius: 6px;
-    background-color: rgba(49, 50, 68, 0.6);
+    padding: 0 6px;
+    border-radius: 999px;
     color: #f38ba8;
     transition: background-color 200ms ease, color 200ms ease;
 }
