@@ -143,7 +143,6 @@ fi
 
 # ── 8. Đặt zsh làm shell mặc định ────────────────────────────────────
 if [ "$(basename "$SHELL")" != "zsh" ]; then
-    log "Đặt zsh làm shell mặc định (cần mật khẩu ĐĂNG NHẬP của bạn, không phải sudo)..."
     log "Đặt zsh làm shell mặc định..."
     # sudo chsh (không phải chsh trần) — chsh trần sẽ hỏi LẠI mật khẩu đăng
     # nhập của chính bạn qua PAM, phá vỡ lời hứa "chỉ hỏi mật khẩu 1 lần"
