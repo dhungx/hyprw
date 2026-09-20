@@ -23,4 +23,4 @@ hl.window_rule({
 -- Layer rules — blur cho bar/launcher/lock
 hl.layer_rule({ match = { namespace = "waybar" }, blur = true })
 hl.layer_rule({ match = { namespace = "fuzzel" }, blur = true })
-hl.layer_rule({ match = { namespace = "wlogout" }, blur = true })
+hl.layer_rule({ match = { namespace = "hyprw-power-menu" }, blur = true })

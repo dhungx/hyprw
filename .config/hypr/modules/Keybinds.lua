@@ -12,9 +12,11 @@ hl.bind(mainMod .. " + P", hl.dsp.window.pseudo())
 hl.bind(mainMod .. " + J", hl.dsp.layout("togglesplit"))
 hl.bind(mainMod .. " + F", hl.dsp.exec_cmd("hyprctl dispatch fullscreen 0"))
 
--- Khoá máy / đăng xuất (cần cài: hyprlock, wlogout)
+-- Khoá máy (cần cài: hyprlock)
 hl.bind(mainMod .. " + L", hl.dsp.exec_cmd(shared.lockCmd))
-hl.bind(mainMod .. " + M", hl.dsp.exec_cmd("wlogout"))
+-- Menu nguồn kiểu bar — xem scripts/power-menu.py để rõ vì sao KHÔNG dùng
+-- wlogout (code gốc hardcode fullscreen, không config được)
+hl.bind(mainMod .. " + M", hl.dsp.exec_cmd("python3 ~/.config/hypr/scripts/power-menu.py"))
 
 -- Đổi wallpaper ngay lúc dùng máy, có animation, không cần sửa file/reload
 -- (cần cài: awww — xem scripts/wallpaper-select.sh)

@@ -1,6 +1,7 @@
 # hyprw
 
-Cấu hình đầy đủ: Hyprland (Lua, ≥0.55) + Waybar + hyprlock + hypridle + wlogout,
+Cấu hình đầy đủ: Hyprland (Lua, ≥0.55) + Waybar + hyprlock + hypridle + menu
+nguồn tự viết (thay wlogout — lý do xem phần "Menu nguồn" bên dưới),
 theme Catppuccin Mocha đồng bộ. Tối ưu cho laptop Intel + NVIDIA RTX 3050 hybrid.
 
 ## Quan trọng trước khi cài
@@ -62,12 +63,12 @@ hypr/modules/         — Monitors, ENVariables, Startup_Apps, LookAndFeel,
 hypr/hypridle.conf    — quản lý idle/khoá máy tự động (định dạng riêng, không Lua)
 hypr/hyprlock.conf    — giao diện màn hình khoá (định dạng riêng, không Lua)
 hypr/scripts/         — wallpaper-select.sh (Super+W), ime-select.sh (Super+Shift+Space),
-                        osd-volume.sh + osd-brightness.sh (popup % khi chỉnh phím media)
+                        osd-volume.sh + osd-brightness.sh (popup % khi chỉnh phím media),
+                        power-menu.py (Super+M, xem phần "Menu nguồn")
 btop/                 — resource monitor theme Catppuccin Mocha, alias thay htop
 fcitx5/               — gõ tiếng Việt (Unikey) + tiếng Anh
 wallpaper/            — 8 ảnh nền có sẵn, copy sang ~/.config/hypr/wallpapers/
 waybar/               — thanh bar
-wlogout/              — menu nguồn (khoá/đăng xuất/tắt máy)
 gtk-3.0, gtk-4.0/     — đồng bộ theme cho app GTK
 ```
 
@@ -83,7 +84,7 @@ gtk-3.0, gtk-4.0/     — đồng bộ theme cho app GTK
 | Super+P | Pseudo-tile |
 | Super+J | Đổi hướng chia dwindle |
 | Super+L | Khoá máy |
-| Super+M | Menu nguồn (wlogout) |
+| Super+M | Menu nguồn dạng bar (Super+M lần nữa hoặc Esc để đóng) |
 | Super+C | Clipboard history |
 | Super+W | **Đổi wallpaper runtime** — mở picker, chọn ảnh, chuyển có animation ngay, không cần sửa file/reload |
 | Super+Space | **Đổi nhanh Anh ↔ Việt** (fcitx5 xử lý trực tiếp, hoạt động mọi app) |
@@ -129,9 +130,25 @@ gtk-3.0, gtk-4.0/     — đồng bộ theme cho app GTK
   path pacman cài, tự bỏ qua nếu chưa cài, không lỗi) + prompt `starship`
   theme cùng bảng màu. Nhớ chạy `chsh -s /usr/bin/zsh` — chỉ cài package
   không tự đổi shell mặc định
-- `wlogout` giờ dùng icon Nerd Font thật (đặt trong field `text` của layout,
-  hiển thị như label thật — không phải PNG hay CSS content ảo), đồng bộ với
-  waybar
+- **Menu nguồn (Super+M) không còn dùng wlogout** — đọc thẳng mã nguồn
+  (`ArtsyMacaw/wlogout/main.c`) xác nhận nó hardcode neo cả 4 cạnh màn hình
+  (`for j in 4 edges: gtk_layer_set_anchor(win, j, TRUE)`), không có config
+  nào đổi được thành dải nút dính bar như ảnh mẫu — đây là giới hạn code
+  gốc, không phải thiếu tuỳ chọn. Waybar cũng không đọc lại layout khi nhận
+  phím tắt. Nên `scripts/power-menu.py` là 1 layer-shell surface tự viết
+  (Python + PyGObject + `gtk-layer-shell` — dùng lại đúng thư viện waybar
+  đã tải sẵn, không thêm framework mới như eww/AGS/Astal):
+  - Đặt layer `OVERLAY` (đè lên trên waybar) — không cần tắt waybar thật,
+    tránh rủi ro waybar không tự hiện lại nếu có lỗi
+  - Animation trượt tự viết tay (`GLib.timeout_add` đổi margin + opacity
+    dần từng bước) — **không dùng CSS transition**, vì
+    `GtkLayerShell.set_margin()` là thuộc tính giao thức Wayland, CSS
+    không áp dụng lên được, đổi trực tiếp sẽ nhảy tức thì chứ không mượt
+  - Không chạy nền thường trực — mỗi lần Super+M spawn mới (giống cách
+    wlogout cũ hoạt động), dùng file PID trong `$XDG_RUNTIME_DIR` để biết
+    đã mở chưa; bấm lại thì gửi `SIGUSR1` cho tiến trình đang chạy tự chạy
+    animation đóng rồi thoát, không mở thêm bản thứ 2. RAM = 0 khi không
+    dùng, chỉ tốn trong đúng lúc menu đang hiện trên màn hình
 - `portals.conf` + dòng `dbus-update-activation-environment` trong
   `hyprland.lua` — cần cả 2 để screen share qua Zoom/OBS/Discord chạy đúng.
   Thiếu export biến môi trường vào systemd là nguyên nhân phổ biến nhất gây

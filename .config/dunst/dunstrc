@@ -1,4 +1,4 @@
-# dunstrc — theme Catppuccin Mocha, đồng bộ với waybar/hyprlock/wlogout
+# dunstrc — theme Catppuccin Mocha, đồng bộ với waybar/hyprlock/power-menu
 
 [global]
     width = 320

@@ -23,18 +23,14 @@ require("modules.WindowRules")
 
 --[[
 ════════════════════════════════════════════════════════════
-CẦN CÀI (paru -S / pacman -S) để chạy đủ chức năng:
+Danh sách package đầy đủ + thứ tự cài: xem install.sh (nguồn duy nhất,
+tránh 2 nơi ghi 2 danh sách rồi lệch nhau theo thời gian).
 
-hyprland waybar dunst hyprpaper hypridle hyprlock wlogout
-foot thunar fuzzel cliphist
-grim slurp wl-clipboard wireplumber brightnessctl playerctl
-hyprpolkitagent qt5ct qt6ct nwg-look
-catppuccin-gtk-theme-blue (AUR)   -- hoặc đổi GTK_THEME trong ENVariables.lua
-
-Chưa nằm trong Lua (định dạng RIÊNG, không phải Lua), làm theo README:
-- hypridle.conf, hyprlock.conf, hyprpaper.conf
+Các file KHÔNG phải Lua (định dạng riêng), tham khảo README:
+- hypridle.conf, hyprlock.conf
 - waybar/config.jsonc + style.css
-- wlogout/layout + style.css
+- scripts/power-menu.py (thay wlogout — xem comment đầu file đó)
 - qt5ct/qt5ct.conf, qt6ct/qt6ct.conf
 ════════════════════════════════════════════════════════════
+]]
 ]]

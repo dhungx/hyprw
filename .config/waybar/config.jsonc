@@ -15,7 +15,7 @@
     "height": 34,
     "spacing": 4,
 
-    "modules-left": ["hyprland/workspaces", "idle_inhibitor"],
+    "modules-left": ["hyprland/workspaces"],
     "modules-center": ["group/clock-drawer"],
     "modules-right": [
         "group/system-pill",
@@ -46,14 +46,6 @@
         "format-icons": {
             "default": "○",
             "active": "●"
-        }
-    },
-
-    "idle_inhibitor": {
-        "format": "{icon}",
-        "format-icons": {
-            "activated": "\uf06e",
-            "deactivated": "\uf070"
         }
     },
 
@@ -194,12 +186,21 @@
     },
 
     "tray": {
-        "spacing": 8
+        "spacing": 8,
+        // Ẩn riêng icon fcitx5 (hiện chữ vi/en gây rối, không cần thiết vì
+        // đã có Super+Space đổi ngôn ngữ) — không ẩn icon app khác nếu có.
+        // fcitx5 không cho tắt icon khay từ chính nó (xác nhận từ maintainer:
+        // github.com/fcitx/fcitx5/discussions/934, "by design"), nên phải
+        // chặn ở phía waybar bằng "ignore-list" (khoá thật lấy từ mã nguồn
+        // waybar: src/modules/sni/tray.cpp, hàm parseIgnoreList).
+        // Nếu tên "fcitx" không khớp, thử "fcitx5" hoặc gỡ dòng waybar log
+        // (WAYBAR_LOG_LEVEL=trace waybar) để xem đúng tên item đang đăng ký.
+        "ignore-list": ["fcitx"]
     },
 
     "custom/power": {
         "format": "\uf011",
-        "on-click": "wlogout",
+        "on-click": "python3 ~/.config/hypr/scripts/power-menu.py",
         "tooltip": false
     }
 }

@@ -62,8 +62,12 @@ PACMAN_PKGS=(
     # Bar / thông báo / launcher / terminal
     waybar dunst fuzzel foot
     # Tiện ích phiên làm việc
-    wlogout grim slurp wl-clipboard brightnessctl awww cliphist playerctl
+    grim slurp wl-clipboard brightnessctl awww cliphist playerctl
     thunar gvfs
+    # Menu nguồn tự viết (xem .config/hypr/scripts/power-menu.py) — dùng
+    # lại đúng gtk-layer-shell mà waybar đã tải sẵn, không thêm framework
+    # mới nào (không eww/AGS/Astal) để giữ nhẹ
+    python-gobject gtk-layer-shell
     # Âm thanh (PipeWire)
     pipewire pipewire-pulse pipewire-alsa wireplumber
     # Theming

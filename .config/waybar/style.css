@@ -23,7 +23,6 @@ window#waybar {
    lên ảnh nền sáng màu, vì không còn dải nền tối phía sau nữa. ══ */
 #workspaces,
 #group-clock-drawer,
-#idle_inhibitor,
 #group-system-pill,
 #tray {
     background-color: rgba(30, 30, 46, 0.75);
@@ -89,10 +88,6 @@ window#waybar {
 .drawer-child {
     margin-left: 8px;
     color: #a6adc8;
-}
-
-#idle_inhibitor {
-    color: #f9e2af;
 }
 
 #tray {
