@@ -133,22 +133,48 @@ gtk-3.0, gtk-4.0/     — đồng bộ theme cho app GTK
 - **Menu nguồn (Super+M) không còn dùng wlogout** — đọc thẳng mã nguồn
   (`ArtsyMacaw/wlogout/main.c`) xác nhận nó hardcode neo cả 4 cạnh màn hình
   (`for j in 4 edges: gtk_layer_set_anchor(win, j, TRUE)`), không có config
-  nào đổi được thành dải nút dính bar như ảnh mẫu — đây là giới hạn code
-  gốc, không phải thiếu tuỳ chọn. Waybar cũng không đọc lại layout khi nhận
-  phím tắt. Nên `scripts/power-menu.py` là 1 layer-shell surface tự viết
-  (Python + PyGObject + `gtk-layer-shell` — dùng lại đúng thư viện waybar
-  đã tải sẵn, không thêm framework mới như eww/AGS/Astal):
-  - Đặt layer `OVERLAY` (đè lên trên waybar) — không cần tắt waybar thật,
-    tránh rủi ro waybar không tự hiện lại nếu có lỗi
-  - Animation trượt tự viết tay (`GLib.timeout_add` đổi margin + opacity
-    dần từng bước) — **không dùng CSS transition**, vì
-    `GtkLayerShell.set_margin()` là thuộc tính giao thức Wayland, CSS
-    không áp dụng lên được, đổi trực tiếp sẽ nhảy tức thì chứ không mượt
-  - Không chạy nền thường trực — mỗi lần Super+M spawn mới (giống cách
-    wlogout cũ hoạt động), dùng file PID trong `$XDG_RUNTIME_DIR` để biết
-    đã mở chưa; bấm lại thì gửi `SIGUSR1` cho tiến trình đang chạy tự chạy
-    animation đóng rồi thoát, không mở thêm bản thứ 2. RAM = 0 khi không
-    dùng, chỉ tốn trong đúng lúc menu đang hiện trên màn hình
+  nào đổi được — đây là giới hạn code gốc, không phải thiếu tuỳ chọn.
+  `scripts/power-menu.py` viết bằng Python + PyGObject + `gtk-layer-shell`
+  (dùng lại đúng thư viện waybar đã tải sẵn — không thêm framework mới như
+  Quickshell/eww/AGS/Astal; đo thực tế Quickshell tốn ~400MB RAM + GPU
+  trung bình 15%/đỉnh 50% so với GTK3 chỉ vài chục MB gần 0% GPU).
+
+  **Hiệu ứng "3 viên thuốc gộp thành 1"** — bấm Super+M, 3 viên thuốc thật
+  của waybar (workspaces / đồng hồ / system-pill+tray) trông như tự di
+  chuyển + co giãn khít lại thành 1 viên thuốc dài giữa màn hình, rồi 5
+  icon nguồn mờ dần hiện ra bên trong. Vài quyết định kỹ thuật quan trọng:
+  - **3 cửa sổ layer-shell riêng** (không phải 1) — mỗi cửa sổ giả lập
+    đúng 1 viên thuốc thật. Đặt cả 3 ở layer `OVERLAY` (cao nhất trong 4
+    tầng `background < bottom < top < overlay` của wlr-layer-shell) để tự
+    đè lên waybar (đang ở layer `top`) — không cần gửi lệnh ẩn/hiện waybar
+    thật, tránh race-condition. Waybar không hề bị tắt, số liệu luôn mới
+    khi đóng menu
+  - **Không dùng CSS transform để "bay"** — xác nhận qua mailing list
+    chính thức GNOME (gtk-list, 05/2017) + docs.gtk.org/gtk3: GTK3 không
+    có CSS `transform` cho widget thường (chỉ `-gtk-icon-transform` cho
+    icon). Phải tween thẳng x/y/width/height của cửa sổ qua
+    `GLib.timeout_add` — cũng vì lý do này, `Gtk.Window.resize()` cần gọi
+    `set_size_request()` ngay trước mỗi lần resize trong vòng tween (mặc
+    định GTK không cho resize nhỏ hơn size request hiện có)
+  - **Chỉ 1 trong 3 cửa sổ (viên ở giữa) giữ nút bấm thật** — 2 viên
+    trái/phải chỉ là nền màu phẳng, co nhỏ dần về 0 và ẩn đi ngay khi viên
+    giữa phình to chiếm trọn viên thuốc gộp — đỡ phải chia 5 nút cắt ngang
+    qua ranh giới 3 cửa sổ khác nhau
+  - **Toạ độ 3 viên thuốc là ước lượng** — lấy độ phân giải màn hình qua
+    `hyprctl monitors -j` (chọn đúng monitor có `"focused": true`, không
+    mặc định monitor đầu/toạ độ (0,0) — quan trọng nếu dùng nhiều màn
+    hình), còn bề rộng mỗi viên (`WORKSPACES_WIDTH`, `CLOCK_WIDTH`,
+    `SYSTEM_TRAY_WIDTH` đầu file) là suy đoán theo layout đã biết, **đánh
+    dấu TODO ngay trong code** — vì Hyprland không biết toạ độ widget bên
+    trong 1 app GTK, chỉ biết toạ độ cả cửa sổ waybar. Lệch vài chục px là
+    bình thường, chỉnh tay theo số đo thật sau khi lên máy
+  - **Xử lý bấm Super+M liên tục nhanh** — có theo dõi vị trí THẬT đang
+    đứng mỗi khung hình (`state["current"]`) — nếu bấm đóng giữa lúc đang
+    mở dở, tween ngược bắt đầu đúng từ vị trí dở dang đó, không nhảy cóc
+    tới vị trí "đã gộp xong" trước rồi mới lùi lại
+  - Không chạy nền thường trực — mỗi lần Super+M spawn mới, dùng file PID
+    trong `$XDG_RUNTIME_DIR`; bấm lại thì gửi `SIGUSR1` cho tiến trình
+    đang chạy để tự đóng, không mở thêm bản thứ 2. RAM = 0 khi không dùng
 - `portals.conf` + dòng `dbus-update-activation-environment` trong
   `hyprland.lua` — cần cả 2 để screen share qua Zoom/OBS/Discord chạy đúng.
   Thiếu export biến môi trường vào systemd là nguyên nhân phổ biến nhất gây
