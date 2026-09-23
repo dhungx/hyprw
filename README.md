@@ -12,7 +12,7 @@ chỉ dùng `hyprland.lua` trong bộ này.
 ## Cài vào máy
 Từ TTY (chưa cần vào GUI), clone repo rồi chạy đúng 1 file:
 ```bash
-git clone <url-repo-của-bạn> hyprw
+git clone --depth 1 https://github.com/dhungx/hyprw
 cd hyprw
 chmod +x install.sh
 ./install.sh
@@ -142,32 +142,54 @@ gtk-3.0, gtk-4.0/     — đồng bộ theme cho app GTK
   **Hiệu ứng "3 viên thuốc gộp thành 1"** — bấm Super+M, 3 viên thuốc thật
   của waybar (workspaces / đồng hồ / system-pill+tray) trông như tự di
   chuyển + co giãn khít lại thành 1 viên thuốc dài giữa màn hình, rồi 5
-  icon nguồn mờ dần hiện ra bên trong. Vài quyết định kỹ thuật quan trọng:
-  - **3 cửa sổ layer-shell riêng** (không phải 1) — mỗi cửa sổ giả lập
-    đúng 1 viên thuốc thật. Đặt cả 3 ở layer `OVERLAY` (cao nhất trong 4
-    tầng `background < bottom < top < overlay` của wlr-layer-shell) để tự
-    đè lên waybar (đang ở layer `top`) — không cần gửi lệnh ẩn/hiện waybar
-    thật, tránh race-condition. Waybar không hề bị tắt, số liệu luôn mới
-    khi đóng menu
+  icon nguồn mờ dần hiện ra bên trong. Đã qua 2 bản, vài quyết định kỹ
+  thuật quan trọng:
+  - **Ẩn waybar thật bằng signal, không "che" giả lập** — bản đầu tạo 3
+    overlay kích thước ước lượng để che khít lên 3 viên thuốc thật, ước
+    lượng sai vài chục px là lộ 1 phần ra ngoài, thấy rõ lúc animation
+    chạy. Bản này chuyển sang **ẩn thật** waybar qua `killall -SIGUSR1
+    waybar` (waybar tự hỗ trợ qua key `"on-sigusr1": "hide"` /
+    `"on-sigusr2": "show"` trong `config.jsonc` — xác nhận qua man page
+    chính thức `waybar.5`, dùng giá trị tường minh thay vì mặc định
+    `toggle`/`reload` vì `toggle` mặc định được chính người dùng Waybar
+    báo cáo lệch trạng thái khi gửi signal dồn dập). Sau khi ẩn, không
+    còn gì thật ở dưới để lộ ra — kích thước overlay từ đây chỉ còn ảnh
+    hưởng thẩm mỹ, không còn gây lỗi hiển thị. `SIGUSR2` (hiện lại) được
+    gửi đúng lúc animation đóng đã chạy ~80%, không đợi đóng hẳn — lúc đó
+    overlay gần vô hình nên chồng lấp ngắn không ai nhận ra, còn đợi đóng
+    hẳn mới gửi sẽ có 1 khoảng trống (không overlay, không waybar) rõ hơn.
+    Lưu ý đã biết: waybar không tự báo trạng thái qua signal, nên
+    `SIGUSR2` làm nó "show" có thể chớp/delay/IO nhẹ — ghi nhận từ 1 dự án
+    có thật (`waybar_auto_hide`) dùng đúng kỹ thuật này, chấp nhận được,
+    không phải lỗi code ở đây
+  - **Mỗi cửa sổ chỉ tạo 1 lần, animate bằng `Gtk.Fixed` thay vì resize
+    lặp lại** — bản đầu gọi `GtkLayerShell.set_margin()`/`resize()` mỗi
+    khung hình (~20 lần/animation), mỗi lần là 1 vòng đàm phán thật với
+    Wayland compositor. Bản này tạo mỗi cửa sổ đúng 1 lần ở kích thước
+    hợp bao (union) của vị trí gốc + đích, bên trong dùng `Gtk.Fixed` di
+    chuyển/đổi cỡ 1 widget con — thao tác nội bộ GTK, không đàm phán
+    Wayland, nhẹ hơn nhiều
   - **Không dùng CSS transform để "bay"** — xác nhận qua mailing list
     chính thức GNOME (gtk-list, 05/2017) + docs.gtk.org/gtk3: GTK3 không
     có CSS `transform` cho widget thường (chỉ `-gtk-icon-transform` cho
-    icon). Phải tween thẳng x/y/width/height của cửa sổ qua
-    `GLib.timeout_add` — cũng vì lý do này, `Gtk.Window.resize()` cần gọi
-    `set_size_request()` ngay trước mỗi lần resize trong vòng tween (mặc
-    định GTK không cho resize nhỏ hơn size request hiện có)
+    icon). Toàn bộ animation tween thẳng x/y/width/height qua
+    `GLib.timeout_add`
   - **Chỉ 1 trong 3 cửa sổ (viên ở giữa) giữ nút bấm thật** — 2 viên
     trái/phải chỉ là nền màu phẳng, co nhỏ dần về 0 và ẩn đi ngay khi viên
     giữa phình to chiếm trọn viên thuốc gộp — đỡ phải chia 5 nút cắt ngang
-    qua ranh giới 3 cửa sổ khác nhau
+    qua ranh giới 3 cửa sổ khác nhau. Cũng chỉ cửa sổ này nhận keyboard
+    (`ON_DEMAND`) để phím Esc hoạt động — bản đầu vô tình đặt `NONE` cho
+    cả 3, khiến Esc không bao giờ nhận được sự kiện, đã sửa
   - **Toạ độ 3 viên thuốc là ước lượng** — lấy độ phân giải màn hình qua
     `hyprctl monitors -j` (chọn đúng monitor có `"focused": true`, không
     mặc định monitor đầu/toạ độ (0,0) — quan trọng nếu dùng nhiều màn
     hình), còn bề rộng mỗi viên (`WORKSPACES_WIDTH`, `CLOCK_WIDTH`,
-    `SYSTEM_TRAY_WIDTH` đầu file) là suy đoán theo layout đã biết, **đánh
-    dấu TODO ngay trong code** — vì Hyprland không biết toạ độ widget bên
-    trong 1 app GTK, chỉ biết toạ độ cả cửa sổ waybar. Lệch vài chục px là
-    bình thường, chỉnh tay theo số đo thật sau khi lên máy
+    `SYSTEM_TRAY_WIDTH` đầu file) là suy đoán theo layout đã biết, đánh
+    dấu rõ trong code — giờ chỉ ảnh hưởng thẩm mỹ điểm bắt đầu animation
+    (do đã ẩn waybar thật), không còn là chỗ rủi ro gây lỗi hiển thị nữa
+  - **Icon `suspend` sửa lại** — mã cũ `\uf4ee` nhầm thuộc bộ Octicon,
+    đổi sang `\uf186` (nf-fa-moon, "Power Sleep Symbol") cho đúng bộ Font
+    Awesome dùng xuyên suốt các icon còn lại
   - **Xử lý bấm Super+M liên tục nhanh** — có theo dõi vị trí THẬT đang
     đứng mỗi khung hình (`state["current"]`) — nếu bấm đóng giữa lúc đang
     mở dở, tween ngược bắt đầu đúng từ vị trí dở dang đó, không nhảy cóc

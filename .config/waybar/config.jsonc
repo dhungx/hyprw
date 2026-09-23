@@ -15,6 +15,14 @@
     "height": 34,
     "spacing": 4,
 
+    // Điều khiển ẩn/hiện bởi power-menu.py (Super+M) — dùng giá trị tường
+    // minh show/hide thay vì mặc định toggle/reload, để mỗi signal có
+    // đúng 1 tác dụng cố định, không phụ thuộc trạng thái trước đó (man
+    // page waybar.5 xác nhận toggle mặc định có thể lệch trạng thái nếu
+    // gửi signal dồn dập).
+    "on-sigusr1": "hide",
+    "on-sigusr2": "show",
+
     "modules-left": ["hyprland/workspaces"],
     "modules-center": ["group/clock-drawer"],
     "modules-right": [
