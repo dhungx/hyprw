@@ -33,4 +33,3 @@ Các file KHÔNG phải Lua (định dạng riêng), tham khảo README:
 - qt5ct/qt5ct.conf, qt6ct/qt6ct.conf
 ════════════════════════════════════════════════════════════
 ]]
-]]

@@ -35,8 +35,8 @@ format = '([ $all_status$ahead_behind]($style))'
 
 # Dấu cuối dòng — $ cho user thường, tự đổi thành # nếu chạy bằng root
 [character]
-success_symbol = "[$](bold #a6e3a1) "
-error_symbol = "[$](bold #f38ba8) "
+success_symbol = "[\$](bold #a6e3a1) "
+error_symbol = "[\$](bold #f38ba8) "
 
 [cmd_duration]
 min_time = 2000

@@ -65,7 +65,7 @@ hl.bind(mainMod .. " + mouse:273", hl.dsp.window.resize(), { mouse = true })
 hl.bind(mainMod .. " + C", hl.dsp.exec_cmd("cliphist list | fuzzel --dmenu | cliphist decode | wl-copy"))
 
 -- Screenshot (cần cài: grim, slurp, wl-clipboard)
-hl.bind("", "PRINT", hl.dsp.exec_cmd("grim -g \"$(slurp)\" - | wl-copy"))
+hl.bind("PRINT", hl.dsp.exec_cmd("grim -g \"$(slurp)\" - | wl-copy"))
 hl.bind(mainMod .. " + PRINT", hl.dsp.exec_cmd("grim - | wl-copy"))   -- chụp toàn màn hình
 
 -- Volume / Brightness (locked+repeating = giữ phím vẫn tăng/giảm liên tục)

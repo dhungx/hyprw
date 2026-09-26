@@ -39,7 +39,10 @@ hl.config({
     misc = {
         force_default_wallpaper = 0,     -- tắt wallpaper mascot mặc định của Hyprland
         disable_hyprland_logo = true,
+    },
+    render = {
         vfr = true,                      -- variable frame rate — tiết kiệm pin khi rảnh
+                                          -- (đã chuyển từ misc.vfr sang render.vfr theo build này)
     },
 })
 
