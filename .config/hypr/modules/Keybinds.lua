@@ -11,12 +11,21 @@ hl.bind(mainMod .. " + V", hl.dsp.window.float({ action = "toggle" }))
 hl.bind(mainMod .. " + P", hl.dsp.window.pseudo())
 hl.bind(mainMod .. " + J", hl.dsp.layout("togglesplit"))
 hl.bind(mainMod .. " + F", hl.dsp.exec_cmd("hyprctl dispatch fullscreen 0"))
+hl.bind(mainMod .. " + B", hl.dsp.exec_cmd("firefox"))   -- Browser — F đã dùng cho fullscreen
 
 -- Khoá máy (cần cài: hyprlock)
 hl.bind(mainMod .. " + L", hl.dsp.exec_cmd(shared.lockCmd))
 -- Menu nguồn kiểu bar — xem scripts/power-menu.py để rõ vì sao KHÔNG dùng
 -- wlogout (code gốc hardcode fullscreen, không config được)
 hl.bind(mainMod .. " + M", hl.dsp.exec_cmd("python3 ~/.config/hypr/scripts/power-menu.py"))
+
+-- Wifi + Bluetooth kiểu Windows Quick Settings (Super+A ~ Win+A của
+-- Windows) — cần cài: networkmanager, bluez, bluez-utils (xem install.sh)
+hl.bind(mainMod .. " + A", hl.dsp.exec_cmd("python3 ~/.config/hypr/scripts/quick-settings.py"))
+
+-- Dock kiểu macOS (Super+D) — dock.py chạy nền sẵn (xem Startup_Apps.lua),
+-- lệnh này chỉ gửi SIGUSR1 để BẬT/TẮT HIỂN THỊ, không mở tiến trình mới
+hl.bind(mainMod .. " + D", hl.dsp.exec_cmd("python3 ~/.config/hypr/scripts/dock.py"))
 
 -- Đổi wallpaper ngay lúc dùng máy, có animation, không cần sửa file/reload
 -- (cần cài: awww — xem scripts/wallpaper-select.sh)

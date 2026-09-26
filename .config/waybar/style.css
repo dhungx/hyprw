@@ -69,6 +69,7 @@ window#waybar {
 #group-mem-drawer,
 #group-vol-drawer,
 #group-net-drawer,
+#bluetooth,
 #group-bat-drawer {
     padding: 0 6px;
     border-radius: 999px;
@@ -78,6 +79,7 @@ window#waybar {
 #group-mem-drawer:hover,
 #group-vol-drawer:hover,
 #group-net-drawer:hover,
+#bluetooth:hover,
 #group-bat-drawer:hover {
     background-color: rgba(255, 255, 255, 0.08);
 }

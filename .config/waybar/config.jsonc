@@ -43,6 +43,7 @@
             "group/mem-drawer",
             "group/vol-drawer",
             "group/net-drawer",
+            "bluetooth",
             "group/bat-drawer",
             "custom/power"
         ]
@@ -92,7 +93,8 @@
     "cpu": {
         "format": "\uf2db {usage}%",   // nf-fa-microchip + %
         "interval": 3,
-        "tooltip": false
+        "tooltip": false,
+        "on-click": "python3 ~/.config/hypr/scripts/quick-settings.py"
     },
     "cpu#detail": {
         "format": "{avg_frequency:0.1f}GHz",
@@ -112,7 +114,8 @@
     },
     "memory": {
         "format": "\uefc5 {percentage}%",   // nf-fa-memory + %
-        "tooltip": false
+        "tooltip": false,
+        "on-click": "python3 ~/.config/hypr/scripts/quick-settings.py"
     },
     "memory#detail": {
         "format": "{used:0.1f}GB / {total:0.1f}GB",
@@ -135,7 +138,8 @@
         "format-icons": {
             "default": ["\uf026", "\uf027", "\uf028"]
         },
-        "tooltip": false
+        "tooltip": false,
+        "on-click": "python3 ~/.config/hypr/scripts/quick-settings.py"
     },
     "pulseaudio#detail": {
         "format": "{volume}%",
@@ -159,13 +163,28 @@
         "format-ethernet": "\uef44",
         "format-disconnected": "󰤭",
         "format-icons": ["󰤟", "󰤢", "󰤥", "󰤨"],
-        "tooltip": false
+        "tooltip": false,
+        // Bấm icon mạng -> mở bảng Wifi+Bluetooth (xem scripts/quick-settings.py)
+        "on-click": "python3 ~/.config/hypr/scripts/quick-settings.py"
     },
     "network#detail": {
         "format-wifi": "{essid} {signalStrength}%",
         "format-ethernet": "{ipaddr}",
         "format-disconnected": "Mất mạng",
         "tooltip": false
+    },
+    // Icon Bluetooth riêng — waybar tự có module "bluetooth" native (không
+    // cần custom/script). Chưa chắc tên class CSS đúng theo từng trạng thái
+    // (on/off/connected) nên CSS để đơn giản (đồng bộ nền, không đổi màu
+    // theo trạng thái) — tinh chỉnh thêm nếu muốn.
+    "bluetooth": {
+        "format": "\uf293",
+        "format-connected": "\uf293 {num_connections}",
+        "format-disabled": "\uf293",
+        "format-off": "\uf293",
+        "tooltip-format": "Bluetooth: {status}",
+        "tooltip-format-connected": "{device_enumerate}",
+        "on-click": "python3 ~/.config/hypr/scripts/quick-settings.py"
     },
 
     // ══ Pin: icon đổi theo % thật -> hover hiện % + thời gian còn lại ══
@@ -183,7 +202,8 @@
         "format-charging": "\uf0e7 {capacity}%",
         "format-icons": ["\uf244", "\uf243", "\uf242", "\uf241", "\uf240"],
         "states": { "warning": 20, "critical": 10 },
-        "tooltip": false
+        "tooltip": false,
+        "on-click": "python3 ~/.config/hypr/scripts/quick-settings.py"
     },
     "battery#detail": {
         "format": "còn lại {time}",

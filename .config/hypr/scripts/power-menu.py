@@ -80,12 +80,13 @@ from gi.repository import Gtk, Gdk, GLib, GtkLayerShell  # noqa: E402
 PIDFILE = os.path.join(os.environ.get("XDG_RUNTIME_DIR", "/tmp"), "hyprw-powermenu.pid")
 
 # ── Animation ──────────────────────────────────────────────────────────
-ANIM_STEPS = 20
-ANIM_INTERVAL_MS = 12
-CONTENT_FADE_STEPS = 12
-CONTENT_FADE_INTERVAL_MS = 14
+# Thời lượng tính bằng ms — KHÔNG còn tách STEPS/INTERVAL_MS như bản trước.
+# tween() giờ chạy theo frame clock thật của compositor (xem docstring hàm
+# tween), không đếm số bước cố định nữa, nên chỉ cần biết chạy bao lâu.
+ANIM_DURATION_MS = 240
+CONTENT_FADE_DURATION_MS = 168
 # Gửi SIGUSR2 (hiện waybar thật) khi animation đóng đã chạy tới tỉ lệ này
-# trong tổng số bước — KHÔNG đợi đến 100% (xem lý do trong docstring).
+# trong tổng thời lượng — KHÔNG đợi đến 100% (xem lý do trong docstring).
 SHOW_WAYBAR_AT_RATIO = 0.80
 # Sau khi animation hình dạng đã về xong vị trí gốc, waybar thật CHƯA CHẮC
 # đã kịp redraw xong (SIGUSR2 không tức thời — có "chớp/delay nhẹ" như ghi ở
@@ -96,8 +97,7 @@ SHOW_WAYBAR_AT_RATIO = 0.80
 # "bật phắt" của waybar thành 1 cú tan biến mượt của overlay, dù waybar bên
 # dưới có xuất hiện sớm hay muộn hơn dự kiến vài chục ms cũng không lộ ra.
 POST_REVERSE_BUFFER_MS = 120
-FINAL_FADE_STEPS = 10
-FINAL_FADE_INTERVAL_MS = 15
+FINAL_FADE_DURATION_MS = 150
 # Đối xứng với POST_REVERSE_BUFFER_MS ở trên nhưng cho chiều MỞ: SIGUSR1
 # cũng không ẩn waybar tức thời. Nếu animation đổi hình dạng bắt đầu ngay
 # khi vừa gửi SIGUSR1, overlay có thể đã đổi hình dạng (rời khỏi đúng vị
@@ -107,14 +107,48 @@ FINAL_FADE_INTERVAL_MS = 15
 # đợi thêm cũng không ai thấy khác biệt gì, an toàn hơn hẳn bắt đầu ngay.
 OPEN_HIDE_BUFFER_MS = 120
 
-# ── Vị trí/kích thước ƯỚC LƯỢNG — giờ chỉ còn ảnh hưởng thẩm mỹ, không
-# còn gây lỗi hiển thị (waybar thật đã bị ẩn hoàn toàn trong lúc này) ───
+# ── Vị trí/kích thước 3 viên thuốc gốc — tính từ SỐ THẬT trong
+# .config/waybar/config.jsonc + style.css (không còn đoán từ đầu như bản
+# trước). Vẫn là ước lượng vì waybar không có IPC trả toạ độ pixel thật
+# của từng module — nhưng giờ bám theo đúng padding/font-size/số workspace
+# thật thay vì số ngẫu nhiên. Chỉ còn TRAY_ICON_COUNT là phải đoán tay
+# (số icon khay hệ thống tuỳ app đang chạy, không có cách truy vấn trước).
 BAR_TOP = 6
 BAR_HEIGHT = 34
-WORKSPACES_WIDTH = 120
-CLOCK_WIDTH = 90
-SYSTEM_TRAY_WIDTH = 420
-PILL_GAP = 8
+FONT_SIZE = 13  # style.css: `* { font-size: 13px }`
+MONO_CHAR_WIDTH = FONT_SIZE * 0.6  # quy ước chung font monospace ≈ 0.6em/ký tự
+EDGE_MARGIN = 3  # style.css: `margin: 6px 3px` (3px = mép ngoài cùng trái/phải)
+
+# #workspaces { padding: 0 4px } + mỗi button { padding: 0 6px } + 1 glyph
+WORKSPACES_OUTER_PADDING = 8
+WORKSPACE_BUTTON_WIDTH = 12 + FONT_SIZE
+
+# group-clock-drawer dùng padding mặc định 0 10px; nội dung luôn hiện chỉ
+# có "#clock" (format "{:%H:%M}" = 5 ký tự, "clock#detail" ẩn khi không hover)
+CLOCK_OUTER_PADDING = 20
+CLOCK_CHARS = 5
+
+# #group-system-pill { padding: 0 4px } + 7 phần con. PHÁT HIỆN LẠI khi
+# thêm quick-settings.py: cpu/memory/battery KHÔNG chỉ-icon như tưởng ban
+# đầu — format thật là "icon {usage}%"/"icon {percentage}%"/"icon
+# {capacity}%" (xem config.jsonc), tức có thêm 2-3 ký tự số + dấu %. Chỉ
+# pulseaudio/network/bluetooth/custom-power mới thật sự chỉ-icon (detail
+# dạng số nằm trong module #detail riêng, ẩn tới khi hover).
+SYSTEM_PILL_OUTER_PADDING = 8
+SYSTEM_PILL_ICON_ONLY_COUNT = 4  # pulseaudio, network, bluetooth, custom/power
+SYSTEM_PILL_ICON_ONLY_WIDTH = 12 + FONT_SIZE
+SYSTEM_PILL_PERCENT_COUNT = 3  # cpu, memory, battery — "icon NN%"
+# icon + 1 khoảng trắng + tối đa 3 chữ số + "%" ~ 4-5 ký tự, lấy dư 1 chút
+SYSTEM_PILL_PERCENT_WIDTH = 12 + FONT_SIZE + 4 * MONO_CHAR_WIDTH
+# waybar "spacing": 4 → khoảng cách giữa #group-system-pill và #tray (2
+# module riêng trong modules-right, xem config.jsonc)
+MODULE_SPACING = 4
+# #tray { padding: 0 8px } + N icon tray thật — TRAY_ICON_COUNT là số duy
+# nhất trong file này không lấy được từ config, tuỳ app đang chạy (Discord/
+# Telegram/...). Sửa số này nếu viên phải vẫn lệch nhiều so với tray thật.
+TRAY_OUTER_PADDING = 16
+TRAY_ICON_COUNT = 2
+TRAY_ICON_WIDTH = 20
 
 ACTIONS = [
     ("lock", "\uf023", "Khoá máy", ["hyprlock"]),
@@ -133,9 +167,10 @@ box.pm-bg {
     background-color: rgba(30, 30, 46, 0.90);
     border: 2px solid rgba(137, 180, 250, 0.35);
 }
-/* rounded only at outer ends; square where windows touch, see docstring */
-box.pm-bg.round-left  { border-radius: 999px 0 0 999px; border-right-width: 0; }
-box.pm-bg.round-right { border-radius: 0 999px 999px 0; border-left-width: 0; }
+/* every pill (left/mid/right) is fully rounded at all times now, no more
+   "square where they touch" hack, since left/right now fade out as they
+   shrink (see comments in start_geometry_forward/do_geometry_reverse) and
+   no longer assume they stay flush against the mid pill the whole time */
 box.pm-bg.round-both  { border-radius: 999px; }
 label.pm-clock {
     font-family: "JetBrainsMono Nerd Font";
@@ -198,6 +233,19 @@ def get_focused_monitor():
     except Exception:
         pass
     return 1920, 1080, 0, 0
+
+
+def get_workspace_count():
+    """Số workspace ĐANG TỒN TẠI thật qua hyprctl — config.jsonc không bật
+    persistent-workspaces nên waybar mặc định chỉ hiện đúng số này, không
+    phải đoán như WORKSPACES_WIDTH ở bản trước."""
+    try:
+        out = subprocess.run(
+            ["hyprctl", "workspaces", "-j"], capture_output=True, text=True, timeout=2
+        ).stdout
+        return max(1, len(json.loads(out)))
+    except Exception:
+        return 5
 
 
 def ease_out_cubic(t):
@@ -267,25 +315,41 @@ class Pill:
         self.child.set_size_request(max(1, int(w)), max(1, int(h)))
 
 
-def tween(get_frames, duration_steps, interval_ms, on_done=None, on_ratio=None):
-    step = {"i": 0}
-    fired_ratio = {"done": False}
+def tween(widget, get_frames, duration_ms, on_done=None, on_ratio=None):
+    """Animate qua Gtk.Widget.add_tick_callback — đồng bộ FRAME CLOCK thật
+    của compositor, thay vì GLib.timeout_add (hẹn giờ đồng hồ tường, không
+    biết gì về nhịp làm mới màn hình thật). Đây là cách GTK chính thức
+    khuyến nghị cho animation (docs.gtk.org, "Frame clocks").
 
-    def tick():
-        step["i"] += 1
-        t = step["i"] / duration_steps
-        eased = ease_out_cubic(t)
-        get_frames(eased)
-        if on_ratio and not fired_ratio["done"] and t >= SHOW_WAYBAR_AT_RATIO:
-            fired_ratio["done"] = True
+    Bản trước dùng timeout 12ms cố định (~83 lần/giây) — trên màn 144Hz
+    thật của máy này, chu kỳ khung hình thật là ~6.94ms, không chia hết
+    cho 12ms, nên 2 nhịp liên tục lệch pha nhau: có khung timeout rơi vào
+    giữa 2 lần vsync (phải đợi khung sau mới lên hình, tự nhiên khựng 1
+    nhịp), có khung lại trùng gần sát vsync kế tiếp. Timeout càng ngắn để
+    né vấn đề này càng vô nghĩa vì bản chất 2 đồng hồ (wall-clock timer và
+    vsync) không đồng bộ với nhau. add_tick_callback do compositor tự gọi
+    ĐÚNG mỗi lần thật sự có 1 khung hình mới để vẽ, nên luôn khớp bất kể
+    màn hình 60Hz/144Hz/bất kỳ Hz nào — không còn khái niệm "bước" cố định,
+    chỉ còn "đã trôi qua bao nhiêu ms thật" tại mỗi lần gọi.
+    """
+    state = {"start_us": None, "ratio_fired": False}
+
+    def tick(_widget, frame_clock):
+        now_us = frame_clock.get_frame_time()
+        if state["start_us"] is None:
+            state["start_us"] = now_us
+        t = min(1.0, (now_us - state["start_us"]) / 1000 / duration_ms)
+        get_frames(ease_out_cubic(t))
+        if on_ratio and not state["ratio_fired"] and t >= SHOW_WAYBAR_AT_RATIO:
+            state["ratio_fired"] = True
             on_ratio()
-        if step["i"] >= duration_steps:
+        if t >= 1.0:
             if on_done:
                 on_done()
-            return False
-        return True
+            return GLib.SOURCE_REMOVE
+        return GLib.SOURCE_CONTINUE
 
-    GLib.timeout_add(interval_ms, tick)
+    widget.add_tick_callback(tick)
 
 
 def main():
@@ -305,12 +369,23 @@ def main():
 
     mon_w, mon_h, mon_x, mon_y = get_focused_monitor()
 
-    orig_left = dict(x=mon_x + 9, y=mon_y + BAR_TOP, w=WORKSPACES_WIDTH, h=BAR_HEIGHT)
+    workspaces_width = WORKSPACES_OUTER_PADDING + get_workspace_count() * WORKSPACE_BUTTON_WIDTH
+    clock_width = CLOCK_OUTER_PADDING + CLOCK_CHARS * MONO_CHAR_WIDTH
+    tray_width = (
+        SYSTEM_PILL_OUTER_PADDING
+        + SYSTEM_PILL_ICON_ONLY_COUNT * SYSTEM_PILL_ICON_ONLY_WIDTH
+        + SYSTEM_PILL_PERCENT_COUNT * SYSTEM_PILL_PERCENT_WIDTH
+        + MODULE_SPACING
+        + TRAY_OUTER_PADDING
+        + TRAY_ICON_COUNT * TRAY_ICON_WIDTH
+    )
+
+    orig_left = dict(x=mon_x + EDGE_MARGIN, y=mon_y + BAR_TOP, w=workspaces_width, h=BAR_HEIGHT)
     orig_mid = dict(
-        x=mon_x + mon_w / 2 - CLOCK_WIDTH / 2, y=mon_y + BAR_TOP, w=CLOCK_WIDTH, h=BAR_HEIGHT
+        x=mon_x + mon_w / 2 - clock_width / 2, y=mon_y + BAR_TOP, w=clock_width, h=BAR_HEIGHT
     )
     orig_right = dict(
-        x=mon_x + mon_w - SYSTEM_TRAY_WIDTH - 9, y=mon_y + BAR_TOP, w=SYSTEM_TRAY_WIDTH, h=BAR_HEIGHT
+        x=mon_x + mon_w - tray_width - EDGE_MARGIN, y=mon_y + BAR_TOP, w=tray_width, h=BAR_HEIGHT
     )
 
     merged_width = min(560, mon_w - 40)
@@ -319,9 +394,9 @@ def main():
     merged_left = dict(x=merged_x, y=mon_y + BAR_TOP, w=0, h=BAR_HEIGHT)
     merged_right = dict(x=merged_x + merged_width, y=mon_y + BAR_TOP, w=0, h=BAR_HEIGHT)
 
-    left_pill = Pill("pm-left", "round-left", mon_x, union_bbox(orig_left, merged_left))
+    left_pill = Pill("pm-left", "round-both", mon_x, union_bbox(orig_left, merged_left))
     mid_pill = Pill("pm-mid", "round-both", mon_x, union_bbox(orig_mid, merged_mid))
-    right_pill = Pill("pm-right", "round-right", mon_x, union_bbox(orig_right, merged_right))
+    right_pill = Pill("pm-right", "round-both", mon_x, union_bbox(orig_right, merged_right))
 
     # Chỉ cửa sổ GIỮA nhận keyboard (ON_DEMAND — chỉ nhận khi đang focus,
     # không chiếm keyboard toàn cục) để phím Esc hoạt động. Bản 1 vô tình
@@ -384,7 +459,7 @@ def main():
             right_pill.child.hide()
             swap_content_to_buttons()
 
-        tween(frame, ANIM_STEPS, ANIM_INTERVAL_MS, on_done=after_merge)
+        tween(mid_pill.win, frame, ANIM_DURATION_MS, on_done=after_merge)
 
     def swap_content_to_buttons():
         # Trước đây: clock_label.set_opacity(0) tắt NGAY không animation,
@@ -411,9 +486,9 @@ def main():
             def fade_in_row(t):
                 row.set_opacity(t)
 
-            tween(fade_in_row, CONTENT_FADE_STEPS, CONTENT_FADE_INTERVAL_MS)
+            tween(mid_pill.win, fade_in_row, CONTENT_FADE_DURATION_MS)
 
-        tween(fade_out_clock, CONTENT_FADE_STEPS, CONTENT_FADE_INTERVAL_MS, on_done=after_clock_fade)
+        tween(mid_pill.win, fade_out_clock, CONTENT_FADE_DURATION_MS, on_done=after_clock_fade)
 
     def make_button(name, icon, label, cmd):
         btn = Gtk.Button()
@@ -471,7 +546,7 @@ def main():
             # tới SHOW_WAYBAR_AT_RATIO (gần xong nhưng chưa hết hoàn toàn).
             # on_done giờ là wait_then_fade (không phải finish trực tiếp) —
             # xem giải thích ở khai báo POST_REVERSE_BUFFER_MS phía trên.
-            tween(frame, ANIM_STEPS, ANIM_INTERVAL_MS, on_done=wait_then_fade, on_ratio=show_waybar)
+            tween(mid_pill.win, frame, ANIM_DURATION_MS, on_done=wait_then_fade, on_ratio=show_waybar)
 
         def wait_then_fade():
             GLib.timeout_add(POST_REVERSE_BUFFER_MS, lambda: (fade_out_overlay(), False)[1])
@@ -482,7 +557,7 @@ def main():
                 for p in (left_pill, mid_pill, right_pill):
                     p.win.set_opacity(opacity)
 
-            tween(fade, FINAL_FADE_STEPS, FINAL_FADE_INTERVAL_MS, on_done=finish)
+            tween(mid_pill.win, fade, FINAL_FADE_DURATION_MS, on_done=finish)
 
         def finish():
             cleanup_pidfile()
@@ -514,9 +589,9 @@ def main():
                 # dạng (do_geometry_reverse) — mirror đúng thứ tự bên mở
                 # (hình dạng xong mới tới fade nội dung), thay vì trước đây
                 # đồng hồ bật full-opacity đột ngột không animation.
-                tween(fade_in_clock, CONTENT_FADE_STEPS, CONTENT_FADE_INTERVAL_MS, on_done=do_geometry_reverse)
+                tween(mid_pill.win, fade_in_clock, CONTENT_FADE_DURATION_MS, on_done=do_geometry_reverse)
 
-            tween(fade_out, CONTENT_FADE_STEPS, CONTENT_FADE_INTERVAL_MS, on_done=after_fade)
+            tween(mid_pill.win, fade_out, CONTENT_FADE_DURATION_MS, on_done=after_fade)
         else:
             do_geometry_reverse()
 

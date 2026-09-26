@@ -15,4 +15,8 @@ hl.on("hyprland.start", function()
     hl.exec_cmd("dunst")
     hl.exec_cmd("/usr/lib/polkit-kde-authentication-agent-1")
     hl.exec_cmd("wl-paste --watch cliphist store")   -- nạp clipboard history nền
+    -- Dock kiểu macOS (xem .config/hypr/scripts/dock.py) — KHÔNG muốn dùng
+    -- dock thì comment nguyên dòng này rồi khởi động lại Hyprland, không
+    -- cần sửa gì khác trong dotfile
+    hl.exec_cmd("python3 ~/.config/hypr/scripts/dock.py")
 end)

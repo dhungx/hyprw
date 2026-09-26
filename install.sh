@@ -64,10 +64,19 @@ PACMAN_PKGS=(
     # Tiện ích phiên làm việc
     grim slurp wl-clipboard brightnessctl awww cliphist playerctl
     thunar gvfs
+    # Trình duyệt (Super+B, cũng ghim sẵn trong dock.py)
+    firefox
     # Menu nguồn tự viết (xem .config/hypr/scripts/power-menu.py) — dùng
     # lại đúng gtk-layer-shell mà waybar đã tải sẵn, không thêm framework
     # mới nào (không eww/AGS/Astal) để giữ nhẹ
     python-gobject gtk-layer-shell
+    # Wifi + Bluetooth kiểu Windows Quick Settings (xem
+    # .config/hypr/scripts/quick-settings.py) — dùng nmcli/bluetoothctl,
+    # không cần applet nền (nm-applet/blueman). network-manager-applet chỉ
+    # để có sẵn nm-connection-editor (rule float trong WindowRules.lua) làm
+    # phương án dự phòng cho cấu hình nâng cao mà quick-settings.py CHƯA hỗ
+    # trợ (IP tĩnh, VPN, 802.1x...)
+    networkmanager network-manager-applet bluez bluez-utils
     # Âm thanh (PipeWire)
     pipewire pipewire-pulse pipewire-alsa wireplumber
     # Theming
@@ -155,7 +164,18 @@ else
     ok "zsh đã là shell mặc định."
 fi
 
-# ── 9. Session SDDM ─────────────────────────────────────────────────
+# ── 9. Bật NetworkManager + Bluetooth (cần cho quick-settings.py) ──────
+for svc in NetworkManager.service bluetooth.service; do
+    if ! systemctl is-enabled "$svc" >/dev/null 2>&1; then
+        log "Bật $svc..."
+        sudo systemctl enable --now "$svc"
+        ok "Đã bật $svc."
+    else
+        ok "$svc đã được bật từ trước, bỏ qua."
+    fi
+done
+
+# ── 10. Session SDDM ─────────────────────────────────────────────────
 # Dùng "start-hyprland" (wrapper chính thức từ Hyprland 0.53+, có crash
 # recovery + safe mode, tự lo phần systemd graphical-session.target) làm
 # lệnh Exec trong session — không gọi thẳng "Hyprland" (xem Master Tutorial
